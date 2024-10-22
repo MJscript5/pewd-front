@@ -1,0 +1,128 @@
+
+body {
+    font-family: "Rubik", sans-serif;
+    background-color: #285483;
+    margin: 0;
+    padding: 0;
+}
+
+.header {
+    background-color: #1e1e1e;
+    color: white;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.header a {
+    color: white;
+    text-decoration: none;
+    font-size: 24px;
+}
+
+.header h2 {
+    margin: 0;
+    flex-grow: 1;
+    text-align: center;
+}
+
+#sortContainer {
+    display: flex;
+    justify-content: flex-start;
+    align-items: left;
+    padding: 10px;
+    background-color: transparent;
+    border-bottom: 1px solid #ccc;
+}
+
+#sortContainer label {
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+#sort {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* Styles for Individual Records */
+.record {
+    background-color: #fff;
+    color: #1e1e1e;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.record .date-time {
+    font-size: 14px;
+    color: #555;
+    text-align: left;
+    flex: 1;
+}
+
+.record .posture {
+    font-size: 18px;
+    font-weight: bold;
+    text-align: left;
+    flex: 2;
+}
+
+.record .time-duration {
+    font-size: 12px;
+    color: #999;
+    text-align: left;
+    flex: 1;
+    margin-right: 10px;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    #sortContainer {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .record {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .record .time-duration,
+    .record .date-time,
+    .record .posture {
+        font-size: 12px;
+        text-align: left;
+    }
+}
+
+@media (max-width: 480px) {
+    #sortContainer {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .record {
+        padding: 10px;
+        margin: 5px 0;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .record .posture {
+        font-size: 14px;
+        text-align: left;
+    }
+
+    .record .date-time {
+        font-size: 10px;
+        margin-bottom: 5px;
+        text-align: left; 
+    }
+}
