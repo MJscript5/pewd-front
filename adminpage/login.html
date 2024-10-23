@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -67,3 +68,74 @@
 
 </body>
 </html>
+=======
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #285483;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            position: relative;
+        }
+        .logo {
+            position: absolute;
+            top: -19%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+        }
+        .create-account {
+            margin-top: 20px;
+        }
+        .create-account a {
+            color: #4CAF50;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-container">
+    <!-- Logo at the top -->
+    <img src="pics/logo.png" alt="Posture Checker Logo" class="logo">
+    <h1>Posture Checker</h1>
+
+    <!-- Admin Login Form -->
+    <h2>Admin Login</h2>
+    <form action="signin.html" method="POST">
+        <div class="input-container">
+            <label for="email">Email:</label>
+            <input type="text" id="email" name="email" required>
+        </div>
+        
+        <div class="input-container">
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+
+        <!-- Remember Me and Forgot Password Section -->
+        <div class="remember-forgot">
+            <label><input type="checkbox" id="remember-me" name="remember-me"> Remember me</label>
+            <a href="forgotpassword.html">Forgot Password?</a>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit">Login</button>
+
+        <!-- Account Creation Prompt -->
+        <p class="create-account">Don't have an account? <a href="signup.html">Create Account</a></p>
+    </form>
+</div>
+
+</body>
+</html>
+>>>>>>> 18249aded329655e6424cad5532225a41e3d0ef7

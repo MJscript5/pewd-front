@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html>
 <head>
@@ -46,4 +47,54 @@
 
 </body>
 
+=======
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Posture Checker</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE-edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="icon" type="image/x-icon" href="pics/logo2.png">
+</head>
+
+<body>
+    <div class="header">
+        <center><h2>Posture Checker</h2></center>
+    </div>
+
+    <div class="tabs">
+        <div id="postureStatus">Posture Status: 
+            <img id="postureStatusImage" src="" alt="Posture Status" width="200" height="200">
+            <i id="postureStatusIcon" class=""></i>
+            <span id="data"></span>
+        </div>
+        <div class="buttons">
+            <a href="record.html"><i class='bx bx-spreadsheet'></i>Record</a>
+        </div>
+        <div class="buttons">
+            <a href="other.html"><i class='bx bx-list-ul'></i>Other Info</a>
+        </div>
+        <div class="buttons">
+            <a href="profile.html"><i class='bx bx-user'></i>Profile</a>
+        </div>
+        <div class="buttons">
+            <a href="#" id="logout-button"><i class='bx bx-log-out-circle'></i>Logout</a>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.1/firebase-app.js" type="module"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.1/firebase-database.js" type="module"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js" type="module"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.1/firebase-messaging.js" type="module"></script>
+    <script src="app.mjs" type="module"></script>
+    <script src="dashboard.mjs" type="module"></script>
+    <script src="logout.mjs" type="module"></script>
+
+</body>
+
+>>>>>>> 18249aded329655e6424cad5532225a41e3d0ef7
 </html>
