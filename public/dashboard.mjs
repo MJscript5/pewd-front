@@ -1,4 +1,4 @@
-import { db } from './app.mjs';
+import { db, auth } from './app.mjs';
 import { ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import { checkAuth, redirectToLogin } from './auth.mjs';
 
@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // User is authenticated, proceed with dashboard functionality
         updateData();
         requestNotificationPermission();
+        setupLogoutButton();
     } catch (error) {
         console.error("User not logged in:", error);
         redirectToLogin();
@@ -55,9 +56,6 @@ function updateData() {
     });
 }
 
-// Call the function to set up the listener and update data
-updateData();
-
 // Function to request notification permission
 function requestNotificationPermission() {
     if (Notification.permission !== "granted") {
@@ -79,8 +77,17 @@ function showNotification() {
     }
 }
 
-// Request notification permission on page load
-document.addEventListener('DOMContentLoaded', (event) => {
-    requestNotificationPermission();
+function setupLogoutButton() {
+    const logoutButton = document.getElementById('logout-button');
+    if (logoutButton) {
+        logoutButton.addEventListener('click', () => {
+            auth.signOut().then(() => {
+                redirectToLogin();
+            }).catch((error) => {
+                console.error('Error signing out:', error);
+            });
+        });
+    }
+}
 
-});
+updateData();

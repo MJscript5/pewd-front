@@ -1,7 +1,7 @@
 import { db, auth } from './app.mjs';
 import { ref, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { checkAuth } from './auth.mjs';
+import { checkAuth, redirectToDashboard } from './auth.mjs';
 
 function displayMessage(message, isError = true) {
     const messageElement = document.querySelector('.login-message');
@@ -37,13 +37,12 @@ async function checkLogin(username, password, rememberMe) {
                         }
                         displayMessage('Login successful! Redirecting...', false);
                         setTimeout(() => {
-                            window.location.href = 'dashboard.html';
-                        }, 200);
+                            redirectToDashboard();                        }, 200);
                         return;
                     } catch (authError) {
                         console.error('Firebase Auth Error:', authError);
                         if (authError.code === 'auth/invalid-credential') {
-                            displayMessage('Invalid username or password. Please try again.');
+                            displayMessage('Invalid username or  password. Please try again.');
                         } else {
                             displayMessage('An error occurred during login. Please try again.');
                         }
@@ -57,6 +56,7 @@ async function checkLogin(username, password, rememberMe) {
             }
         } else {
             displayMessage('No users found. Please sign up.');
+            windows.location.href = 'signup.html';
         }
     } catch (error) {
         console.error('Error fetching users:', error);
@@ -66,11 +66,9 @@ async function checkLogin(username, password, rememberMe) {
 
 document.addEventListener('DOMContentLoaded', async () => {
     try {
-        await checkAuth();
-        // User is already logged in, redirect to dashboard
-        window.location.href = 'dashboard.html';
-    } catch (error) {
-        // User is not logged in, show login form
+        await checkAuth(); // User is already logged in, redirect to dashboard
+        redirectToDashboard();
+    } catch (error) { // User is not logged in, show login form
         console.log("User not logged in, showing login form");
         
         if (localStorage.getItem('rememberMe') === 'true') {
