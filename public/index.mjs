@@ -28,6 +28,10 @@ async function checkLogin(username, password, rememberMe) {
                         // Attempt to sign in with Firebase Authentication
                         await signInWithEmailAndPassword(auth, user.email, password);
                         console.log('Login successful');
+
+                        // Store the username in sessionStorage after successful login
+                        sessionStorage.setItem('username', username);
+
                         if (rememberMe) {
                             localStorage.setItem('username', username);
                             localStorage.setItem('rememberMe', 'true');
@@ -37,7 +41,8 @@ async function checkLogin(username, password, rememberMe) {
                         }
                         displayMessage('Login successful! Redirecting...', false);
                         setTimeout(() => {
-                            redirectToDashboard();                        }, 200);
+                            redirectToDashboard();                        
+                        }, 200);
                         return;
                     } catch (authError) {
                         console.error('Firebase Auth Error:', authError);
@@ -59,8 +64,8 @@ async function checkLogin(username, password, rememberMe) {
             windows.location.href = 'signup.html';
         }
     } catch (error) {
-        console.error('Error fetching users:', error);
-        displayMessage('Error connecting to the database. Please try again later.');
+        console.error('Login Error:', error);
+        displayMessage('Invalid username or password. Please try again.');
     }
 }
 

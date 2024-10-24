@@ -4,20 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Profile - Posture Checker</title>
-    <link rel="stylesheet" href="css/profile.css">
-    <link rel="icon" href="pics/logo2.png" type="image/x-icon">
+    <link rel="stylesheet" href="./css/profile.css">
+    <link rel="icon" type="image/x-icon" href="pics/logo2.png">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 </head>
 <body>
-    <main class="profile">
+    <div class="profile">
         <div class="header">
             <a href="dashboard.html" class="back-button" id="back-to-dashboard">
                 <i class='bx bx-arrow-back'></i>
             </a>
             <h1>Posture Checker</h1>
         </div>
+
         <div class="profile-picture-container">
-            <img id="profile-picture" src="/placeholder.svg?height=100&width=100" alt="User Profile Picture">
+            <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" id="profile-picture">
+                <path fill="currentColor" d="M12 2a5 5 0 1 0 5 5a5 5 0 0 0-5-5m0 8a3 3 0 1 1 3-3a3 3 0 0 1-3 3m9 11v-1a7 7 0 0 0-7-7h-4a7 7 0 0 0-7 7v1h2v-1a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5v1z" />
+            </svg>
             <div class="profile-picture-controls">
                 <label for="profile-picture-input" class="upload-button">
                     <i class='bx bx-upload'></i>
@@ -49,7 +52,7 @@
             </p>
             <p id="email-verification-status" class="verification-status"></p>
         </div>
-
+        
         <div class="block editable">
             <p>Phone Number:</p>
             <input type="tel" id="phone-number" disabled>
@@ -58,14 +61,11 @@
             </button>
             <p id="phone-verification-status" class="verification-status"></p>
         </div>
-
-        <div id="verification-code-container" class="block" style="display: none;">
-            <p>Verification Code:</p>
-            <input type="text" id="verification-code">
-            <button id="confirm-verification-code" class="verify-button">
-                Confirm Code
-            </button>
-        </div>
+        
+        <div id="verification-code-container" style="display: none;">
+            <input type="text" id="verification-code" placeholder="Enter verification code">
+            <button id="confirm-verification-code">Confirm Code</button>
+        </div>        
 
         <div class="block editable">
             <p>Birthday:</p>
@@ -76,7 +76,7 @@
         <button id="save-changes" class="save-button" style="display: none;">Save Changes</button>
     </div>
 
-    <div id="camera-modal" class="modal">
+    <div id="camera-modal" class="modal" style="display: none;">
         <div class="modal-content">
             <video id="camera-view"></video>
             <canvas id="camera-canvas" style="display: none;"></canvas>
@@ -85,7 +85,7 @@
                 <button id="close-camera">Close</button>
             </div>
         </div>
-    </div>
+    </div>    
 
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js" type="module"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js" type="module"></script>

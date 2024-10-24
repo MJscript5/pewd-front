@@ -18,6 +18,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
+function requestNotificationPermission() {
+    if (Notification.permission === "default") {
+        Notification.requestPermission().then(permission => {
+            if (permission !== "granted") {
+                console.log("Notification permission not granted.");
+            }
+        });
+    }
+}
+
 function updateData() {
     const randRef = ref(db, '/Sensor');
 
@@ -54,17 +64,6 @@ function updateData() {
     }, (error) => {
         console.error('Error fetching data:', error);
     });
-}
-
-// Function to request notification permission
-function requestNotificationPermission() {
-    if (Notification.permission !== "granted") {
-        Notification.requestPermission().then(permission => {
-            if (permission !== "granted") {
-                alert("You need to allow notifications to receive posture alerts.");
-            }
-        });
-    }
 }
 
 // Function to show notification

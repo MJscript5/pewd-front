@@ -1,90 +1,82 @@
-import { auth, db } from './app.mjs';
-import { ref, get, update, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-import { RecaptchaVerifier, signInWithPhoneNumber, sendEmailVerification, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { checkAuth, redirectToLogin } from './auth.mjs';
+import { db } from "./app.mjs";
+import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { checkAuth, redirectToLogin } from "./auth.mjs";
+import { ref, get, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 let currentUser = null;
 let isEditing = false;
 
+// // DOM elements
+// const profilePictureInput = document.getElementById('profile-picture-input');
+// const profileImage = document.getElementById('profile-picture');
+// const editButton = document.getElementById('edit-profile');
+// const saveButton = document.getElementById('save-changes');
+// const userIdElement = document.getElementById('user-id');
+// const usernameElement = document.getElementById('username');
+// const emailElement = document.getElementById('user-email');
+// const phoneInput = document.getElementById('phone-number');
+// const birthdayInput = document.getElementById('birthday');
+
 document.addEventListener('DOMContentLoaded', async () => {
   try {
-    const user = await checkAuth();
-    currentUser = user;
-    await fetchUserData(user.uid);
-    setupRecaptcha();
-    setupEventListeners();
+      const user = await checkAuth();  // Use checkAuth to verify if the user is logged in
+      const username = sessionStorage.getItem('username');
+
+      if (username) {
+          fetchUserData(username);  // Fetch user data based on the stored username
+      } else {
+          console.error('No username found in sessionStorage.');
+          redirectToLogin();  // Redirect to login if no username is found
+      }
   } catch (error) {
-      console.error("User not logged in:", error);
-      redirectToLogin();
+      console.error('User is not authenticated:', error);
+      redirectToLogin();  // Redirect to login if no user is authenticated
   }
 });
 
-async function fetchUserData(userId) {
-  const userRef = ref(db, `users/${userId}`);
-  try {
-      const snapshot = await get(userRef);
-      if (snapshot.exists()) {
-          updateProfileUI(snapshot.val());
-      } else {
-          console.error('User data not found');
-          redirectToLogin();
-      }
-  } catch (error) {
-      console.error("Error fetching user data:", error);
-      alert("Failed to load user data. Please try again later.");
-  }
-}
-
-function updateProfileUI(userData) {
-  document.getElementById('username').textContent = userData.username;
-  document.getElementById('user-id').textContent = currentUser.uid;
-  document.getElementById('user-email').textContent = userData.email;
-  document.getElementById('phone-number').value = userData.phone || '';
-  document.getElementById('birthday').value = userData.birthday || '';
-
-  updateVerificationStatus('email', userData.emailVerified);
-  updateVerificationStatus('phone', userData.phoneVerified);
-
-  if (userData.profilePicture) {
-      document.getElementById('profile-picture').src = userData.profilePicture;
-  }
-
-  document.getElementById('verify-email').style.display = userData.emailVerified ? 'none' : 'inline-block';
-  document.getElementById('verify-phone').style.display = userData.phoneVerified ? 'none' : 'inline-block';
-}
-
-function setupRecaptcha() {
-  window.recaptchaVerifier = new RecaptchaVerifier(auth, 'verify-phone', {
-      'size': 'invisible',
-      'callback': (response) => {
-          startPhoneVerification();
-      }
-  });
-}
-
-function setupEventListeners() {
-  document.getElementById('back-to-dashboard').addEventListener('click', () => window.location.href = 'dashboard.html');
-  document.getElementById('copy-user-id').addEventListener('click', copyUserId);
-  document.getElementById('edit-profile').addEventListener('click', toggleEditMode);
-  document.getElementById('save-changes').addEventListener('click', saveChanges);
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('verify-email').addEventListener('click', sendVerificationEmail);
   document.getElementById('verify-phone').addEventListener('click', startPhoneVerification);
   document.getElementById('confirm-verification-code').addEventListener('click', confirmVerificationCode);
-  document.getElementById('verify-email').addEventListener('click', sendVerificationEmail);
-  document.getElementById('profile-picture-input').addEventListener('change', handleFileUpload);
-  document.getElementById('camera-button').addEventListener('click', openCameraModal);
-  document.getElementById('capture-photo').addEventListener('click', capturePhoto);
-  document.getElementById('close-camera').addEventListener('click', closeCameraModal);
+});
+
+async function fetchUserData(username) {
+  const usersRef = ref(db, 'users');
+  try {
+      const snapshot = await get(usersRef);
+      if (snapshot.exists()) {
+          const users = snapshot.val();
+          const matchedUser = Object.entries(users).find(([userId, userData]) => userData.username === username);
+
+          if (matchedUser) {
+              const [userId, userData] = matchedUser;
+              sessionStorage.setItem('userId', userId);  // Store userId for further use
+              populateUserProfile(userData, userId);
+          } else {
+              console.error('No user data found for the provided username.');
+          }
+      } else {
+          console.error('No users found in the database.');
+      }
+  } catch (error) {
+      console.error('Error fetching user data:', error);
+  }
 }
 
-function copyUserId() {
-  const userId = document.getElementById('user-id').textContent;
-  navigator.clipboard.writeText(userId).then(() => {
-      alert('User ID copied to clipboard!');
-  }).catch(err => {
-      console.error('Failed to copy: ', err);
-  });
+function populateUserProfile(userData, userId) {
+  document.getElementById('user-id').textContent = userId;
+  document.getElementById('username').textContent = userData.username;
+  document.getElementById('user-email').textContent = userData.email;
+  document.getElementById('phone-number').value = userData.phoneNumber || '';
+  document.getElementById('birthday').value = userData.birthday || '';
+
+  // Check email and phone verification statuses
+  const user = auth.currentUser;  // Firebase auth current user
+  checkEmailVerificationStatus(user);  // Check email verification status
+  checkPhoneVerificationStatus(userData.phoneVerified);  // Check phone verification status
 }
 
+// Toggle edit/save mode
 function toggleEditMode() {
   isEditing = !isEditing;
   document.getElementById('phone-number').disabled = !isEditing;
@@ -94,57 +86,27 @@ function toggleEditMode() {
 }
 
 async function saveChanges() {
+  const userId = sessionStorage.getItem('userId');
   const updatedData = {
       phone: document.getElementById('phone-number').value,
       birthday: document.getElementById('birthday').value
   };
 
   try {
-      await update(ref(db, `users/${currentUser.uid}`), updatedData);
+      await update(ref(db, `users/${userId}`), updatedData);
       alert('Profile updated successfully!');
-      toggleEditMode();
+      toggleEditMode();  // Exit edit mode after saving
   } catch (error) {
       console.error('Error updating user data:', error);
-      alert('Failed to update profile. Please try again.');
+      alert('Failed to update profile.');
   }
 }
 
-function startPhoneVerification() {
-  const phoneNumber = document.getElementById('phone-number').value;
-  const appVerifier = window.recaptchaVerifier;
-  
-  signInWithPhoneNumber(auth, phoneNumber, appVerifier)
-      .then((confirmationResult) => {
-          window.confirmationResult = confirmationResult;
-          document.getElementById('verification-code-container').style.display = 'block';
-          alert('Verification code sent to your phone. Please enter it below.');
-      }).catch((error) => {
-          console.error('Error sending verification code:', error);
-          alert('Failed to send verification code. Please try again.');
-      });
-}
+document.getElementById('edit-profile').addEventListener('click', toggleEditMode);
+document.getElementById('save-changes').addEventListener('click', saveChanges);
 
-function confirmVerificationCode() {
-    const code = document.getElementById('verification-code').value;
-    window.confirmationResult.confirm(code).then((result) => {
-        update(ref(db, `users/${currentUser.uid}`), { phoneVerified: true });
-        updateVerificationStatus('phone', true);
-        document.getElementById('verification-code-container').style.display = 'none';
-        alert('Phone number verified successfully!');
-    }).catch((error) => {
-        console.error('Error verifying code:', error);
-        alert('Failed to verify the code. Please try again.');
-    });
-}
-
-function sendVerificationEmail() {
-  sendEmailVerification(currentUser).then(() => {
-      alert('Verification email sent. Please check your inbox and follow the instructions.');
-  }).catch((error) => {
-      console.error('Error sending verification email:', error);
-      alert('Failed to send verification email. Please try again.');
-  });
-}
+// Handle file upload for profile picture
+profilePictureInput.addEventListener('change', handleFileUpload);
 
 function handleFileUpload(event) {
   const file = event.target.files[0];
@@ -157,20 +119,19 @@ function handleFileUpload(event) {
 
       const reader = new FileReader();
       reader.onload = function(e) {
-          document.getElementById('profile-picture').src = e.target.result;
-          updateProfilePicture(e.target.result);
+          document.getElementById('profile-picture').src = e.target.result;  // Display the image
+          updateProfilePicture(e.target.result);  // Save image URL to Firebase
       };
       reader.readAsDataURL(file);
   }
 }
-function updateProfilePicture(dataUrl) {
-  update(ref(db, `users/${currentUser.uid}`), { profilePicture: dataUrl })
-      .then(() => {
-          console.log('Profile picture updated successfully');
-      })
-      .catch((error) => {
-          console.error('Error updating profile picture:', error);
-      });
+
+async function updateProfilePicture(dataUrl) {
+  const userId = sessionStorage.getItem('userId');
+  if (userId) {
+      await update(ref(db, `users/${userId}`), { profilePicture: dataUrl });
+      console.log('Profile picture updated successfully');
+  }
 }
 
 function openCameraModal() {
@@ -215,14 +176,132 @@ function capturePhoto() {
   context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
   const dataUrl = canvas.toDataURL('image/png');
-  document.getElementById('profile-picture').src = dataUrl;
-  updateProfilePicture(dataUrl);
+  document.getElementById('profile-picture').src = dataUrl;  // Show captured image in the profile picture container
+  updateProfilePicture(dataUrl);  // Save the captured image to Firebase
 
   closeCameraModal();
 }
 
 function updateVerificationStatus(type, status) {
-  const statusElement = document.getElementById(`${type}-verification-status`);
-  statusElement.textContent = status ? `${type.charAt(0).toUpperCase() + type.slice(1)} verified` : `${type.charAt(0).toUpperCase() + type.slice(1)} not verified`;
-  statusElement.style.color = status ? 'green' : 'red';
+    const statusElement = document.getElementById(`${type}-verification-status`);
+    statusElement.textContent = status ? `${type.charAt(0).toUpperCase() + type.slice(1)} verified` : `${type.charAt(0).toUpperCase() + type.slice(1)} not verified`;
+    statusElement.style.color = status ? 'green' : 'red';
 }
+
+// Event listeners setup
+function setupEventListeners() {
+    document.getElementById('back-to-dashboard').addEventListener('click', () => window.location.href = 'dashboard.html');
+    document.getElementById('copy-user-id').addEventListener('click', copyUserId);
+    editButton.addEventListener('click', toggleEditMode);
+    saveButton.addEventListener('click', saveChanges);
+    document.getElementById('verify-email').addEventListener('click', sendVerificationEmail);
+}
+
+// Copy User ID
+function copyUserId() {
+    navigator.clipboard.writeText(userIdElement.textContent).then(() => {
+        alert('User ID copied to clipboard!');
+    }).catch(err => {
+        console.error('Failed to copy: ', err);
+    });
+}
+
+// Show the verify email button if the email is not verified
+function checkEmailVerificationStatus(user) {
+  const verifyEmailButton = document.getElementById('verify-email');
+  const emailVerificationStatus = document.getElementById('email-verification-status');
+  
+  if (user.emailVerified) {
+      emailVerificationStatus.textContent = 'Email Verified';
+      emailVerificationStatus.style.color = 'green';
+      verifyEmailButton.style.display = 'none';  // Hide verify button if already verified
+  } else {
+      emailVerificationStatus.textContent = 'Email Not Verified';
+      emailVerificationStatus.style.color = 'red';
+      verifyEmailButton.style.display = 'inline-block';  // Show verify button if not verified
+  }
+}
+
+// Trigger email verification
+function sendVerificationEmail() {
+  const user = auth.currentUser;
+  if (user && !user.emailVerified) {
+      sendEmailVerification(user)
+          .then(() => {
+              alert('Verification email sent. Please check your inbox.');
+          })
+          .catch(error => {
+              console.error('Error sending verification email:', error);
+          });
+  }
+}
+
+// Add event listener for the email verification button
+document.getElementById('verify-email').addEventListener('click', sendVerificationEmail);
+
+
+// Initialize reCAPTCHA for phone verification
+window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('verify-phone', {
+  'size': 'invisible',
+  'callback': (response) => {
+      // reCAPTCHA solved - you can proceed with phone verification
+      startPhoneVerification();
+  }
+});
+
+// Show verify phone button if phone is not verified
+function checkPhoneVerificationStatus(phoneVerified) {
+  const verifyPhoneButton = document.getElementById('verify-phone');
+  const phoneVerificationStatus = document.getElementById('phone-verification-status');
+
+  if (phoneVerified) {
+      phoneVerificationStatus.textContent = 'Phone Verified';
+      phoneVerificationStatus.style.color = 'green';
+      verifyPhoneButton.style.display = 'none';  // Hide verify button if already verified
+  } else {
+      phoneVerificationStatus.textContent = 'Phone Not Verified';
+      phoneVerificationStatus.style.color = 'red';
+      verifyPhoneButton.style.display = 'inline-block';  // Show verify button if not verified
+  }
+}
+
+// Start phone verification process
+function startPhoneVerification() {
+  const phoneNumber = document.getElementById('phone-number').value;
+  const appVerifier = window.recaptchaVerifier;
+
+  signInWithPhoneNumber(auth, phoneNumber, appVerifier)
+      .then((confirmationResult) => {
+          window.confirmationResult = confirmationResult;
+          document.getElementById('verification-code-container').style.display = 'block';
+          alert('Verification code sent to your phone.');
+      })
+      .catch((error) => {
+          console.error('Error sending verification code:', error);
+          alert('Failed to send verification code. Please try again.');
+      });
+}
+
+// Confirm phone verification code
+function confirmVerificationCode() {
+  const code = document.getElementById('verification-code').value;
+  window.confirmationResult.confirm(code)
+      .then((result) => {
+          alert('Phone number verified successfully!');
+          // Optionally update Firebase to indicate phone is verified
+          const userId = sessionStorage.getItem('userId');
+          update(ref(db, `users/${userId}`), { phoneVerified: true });
+          checkPhoneVerificationStatus(true);  // Update UI to show phone is verified
+          document.getElementById('verification-code-container').style.display = 'none';
+      })
+      .catch((error) => {
+          console.error('Error verifying code:', error);
+          alert('Invalid verification code. Please try again.');
+      });
+}
+
+// Add event listener for the phone verification button
+document.getElementById('verify-phone').addEventListener('click', startPhoneVerification);
+document.getElementById('confirm-verification-code').addEventListener('click', confirmVerificationCode);
+
+
