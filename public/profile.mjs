@@ -6,17 +6,6 @@ import { ref, get, update } from "https://www.gstatic.com/firebasejs/10.12.0/fir
 let currentUser = null;
 let isEditing = false;
 
-// // DOM elements
-// const profilePictureInput = document.getElementById('profile-picture-input');
-// const profileImage = document.getElementById('profile-picture');
-// const editButton = document.getElementById('edit-profile');
-// const saveButton = document.getElementById('save-changes');
-// const userIdElement = document.getElementById('user-id');
-// const usernameElement = document.getElementById('username');
-// const emailElement = document.getElementById('user-email');
-// const phoneInput = document.getElementById('phone-number');
-// const birthdayInput = document.getElementById('birthday');
-
 document.addEventListener('DOMContentLoaded', async () => {
   try {
       const user = await checkAuth();  // Use checkAuth to verify if the user is logged in
@@ -38,6 +27,12 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('verify-email').addEventListener('click', sendVerificationEmail);
   document.getElementById('verify-phone').addEventListener('click', startPhoneVerification);
   document.getElementById('confirm-verification-code').addEventListener('click', confirmVerificationCode);
+  document.getElementById('edit-profile').addEventListener('click', toggleEditMode);
+  document.getElementById('save-changes').addEventListener('click', saveChanges);
+  document.getElementById('profile-picture-input').addEventListener('change', handleFileUpload);
+  document.getElementById('camera-button').addEventListener('click', openCameraModal);
+  document.getElementById('capture-photo').addEventListener('click', capturePhoto);
+  document.getElementById('close-camera-modal').addEventListener('click', closeCameraModal);
 });
 
 async function fetchUserData(username) {
@@ -69,6 +64,7 @@ function populateUserProfile(userData, userId) {
   document.getElementById('user-email').textContent = userData.email;
   document.getElementById('phone-number').value = userData.phoneNumber || '';
   document.getElementById('birthday').value = userData.birthday || '';
+  document.getElementById('profile-picture').src = userData.profilePicture || 'default-profile-picture-url';
 
   // Check email and phone verification statuses
   const user = auth.currentUser;  // Firebase auth current user
@@ -102,12 +98,7 @@ async function saveChanges() {
   }
 }
 
-document.getElementById('edit-profile').addEventListener('click', toggleEditMode);
-document.getElementById('save-changes').addEventListener('click', saveChanges);
-
 // Handle file upload for profile picture
-profilePictureInput.addEventListener('change', handleFileUpload);
-
 function handleFileUpload(event) {
   const file = event.target.files[0];
   if (file) {
@@ -192,14 +183,14 @@ function updateVerificationStatus(type, status) {
 function setupEventListeners() {
     document.getElementById('back-to-dashboard').addEventListener('click', () => window.location.href = 'dashboard.html');
     document.getElementById('copy-user-id').addEventListener('click', copyUserId);
-    editButton.addEventListener('click', toggleEditMode);
-    saveButton.addEventListener('click', saveChanges);
     document.getElementById('verify-email').addEventListener('click', sendVerificationEmail);
+    document.getElementById('verify-phone').addEventListener('click', startPhoneVerification);
+    document.getElementById('confirm-verification-code').addEventListener('click', confirmVerificationCode);
 }
 
 // Copy User ID
 function copyUserId() {
-    navigator.clipboard.writeText(userIdElement.textContent).then(() => {
+    navigator.clipboard.writeText(document.getElementById('user-id').textContent).then(() => {
         alert('User ID copied to clipboard!');
     }).catch(err => {
         console.error('Failed to copy: ', err);
@@ -236,12 +227,8 @@ function sendVerificationEmail() {
   }
 }
 
-// Add event listener for the email verification button
-document.getElementById('verify-email').addEventListener('click', sendVerificationEmail);
-
-
 // Initialize reCAPTCHA for phone verification
-window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('verify-phone', {
+window.recaptchaVerifier = new RecaptchaVerifier('verify-phone', {
   'size': 'invisible',
   'callback': (response) => {
       // reCAPTCHA solved - you can proceed with phone verification
@@ -299,9 +286,5 @@ function confirmVerificationCode() {
           alert('Invalid verification code. Please try again.');
       });
 }
-
-// Add event listener for the phone verification button
-document.getElementById('verify-phone').addEventListener('click', startPhoneVerification);
-document.getElementById('confirm-verification-code').addEventListener('click', confirmVerificationCode);
 
 
