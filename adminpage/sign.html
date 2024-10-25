@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up & Login Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            background-color: #285483; 
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: #f3f4f5;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            width: 300px;
+            text-align: center;
+        }
+
+        .container img {
+            width: 80px;
+            height: auto;
+            margin-bottom: 15px;
+        }
+
+        h2 {
+            margin-bottom: 15px;
+            font-size: 22px;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .form-button {
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .form-button:hover {
+            background-color: #218838;
+        }
+
+        .error-message, .success-message {
+            display: none;
+            margin-top: 10px;
+        }
+
+        .error-message {
+            color: red;
+        }
+
+        .success-message {
+            color: green;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="signup-container">
+        <img src="pics/logo.png" alt="Logo" class="logo">
+        <h2>Sign Up</h2>
+        <form id="signup-form">
+            <div class="form-group">
+                <label for="signup-fullName">Full Name</label>
+                <input type="text" id="signup-fullName" required>
+            </div>
+            <div class="form-group">
+                <label for="signup-email">Email</label>
+                <input type="email" id="signup-email" required>
+            </div>
+            <div class="form-group">
+                <label for="signup-password">Password</label>
+                <input type="password" id="signup-password" required>
+            </div>
+            <div class="form-group">
+                <label for="signup-confirmPassword">Confirm Password</label>
+                <input type="password" id="signup-confirmPassword" required>
+            </div>
+            <button type="submit" class="form-button">Sign Up</button>
+            <p class="error-message" id="signup-error-message"></p>
+            <p class="success-message" id="signup-success-message"></p>
+        </form>
+        <p>Already have an account? <a href="#" id="switch-to-login">Log In</a></p>
+    </div>
+
+    <div class="container" id="login-container" style="display: none;">
+        <img src="pics/logo.png" alt="Logo" class="logo">
+        <h2>Login</h2>
+        <form id="login-form">
+            <div class="form-group">
+                <label for="login-email">Email</label>
+                <input type="email" id="login-email" required>
+            </div>
+            <div class="form-group">
+                <label for="login-password">Password</label>
+                <input type="password" id="login-password" required>
+            </div>
+            <button type="submit" class="form-button">Log In</button>
+            <p class="error-message" id="login-error-message"></p>
+        </form>
+        <p>Don't have an account? <a href="#" id="switch-to-signup">Sign Up</a></p>
+    </div>
+
+    <script>
+        // Switching between forms
+        document.getElementById("switch-to-login").addEventListener("click", function () {
+            document.getElementById("signup-container").style.display = "none";
+            document.getElementById("login-container").style.display = "block";
+        });
+
+        document.getElementById("switch-to-signup").addEventListener("click", function () {
+            document.getElementById("signup-container").style.display = "block";
+            document.getElementById("login-container").style.display = "none";
+        });
+
+        // Sign Up Logic
+        document.getElementById("signup-form").addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            const fullName = document.getElementById("signup-fullName").value;
+            const email = document.getElementById("signup-email").value;
+            const password = document.getElementById("signup-password").value;
+            const confirmPassword = document.getElementById("signup-confirmPassword").value;
+            const errorMessage = document.getElementById("signup-error-message");
+            const successMessage = document.getElementById("signup-success-message");
+
+            errorMessage.style.display = "none";
+            successMessage.style.display = "none";
+
+            if (password !== confirmPassword) {
+                errorMessage.innerText = "Passwords do not match!";
+                errorMessage.style.display = "block";
+                return;
+            }
+
+            // Simulate saving user data in localStorage
+            const user = { fullName, email, password };
+            localStorage.setItem(email, JSON.stringify(user));
+
+            successMessage.innerText = "Account created successfully!";
+            successMessage.style.display = "block";
+
+            setTimeout(() => {
+                document.getElementById("signup-container").style.display = "none";
+                document.getElementById("login-container").style.display = "block";
+            }, 1500);
+        });
+
+        // Login Logic
+        document.getElementById("login-form").addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            const email = document.getElementById("login-email").value;
+            const password = document.getElementById("login-password").value;
+            const errorMessage = document.getElementById("login-error-message");
+
+            errorMessage.style.display = "none";
+
+            // Retrieve user data from localStorage
+            const user = JSON.parse(localStorage.getItem(email));
+
+            if (!user || user.password !== password) {
+                errorMessage.innerText = "Invalid email or password!";
+                errorMessage.style.display = "block";
+                return;
+            }
+
+            alert("Login successful!");
+            // Optionally redirect or show logged-in content
+        });
+    </script>
+</body>
+</html>

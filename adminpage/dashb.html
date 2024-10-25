@@ -139,6 +139,21 @@
             margin: 0;
             color: #ffffff;
         }
+
+        /* Logout button styling */
+        .logout-btn {
+            background-color: #ffffff;
+            color: rgb(0, 0, 0);
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .logout-btn:hover {
+            background-color: #e5e4e4;
+        }
+
     </style>
 </head>
 <body>
@@ -149,6 +164,9 @@
                 <img src="pics/logo.png" alt="Company Logo">
                 <h2>MMCM Posture Checker</h2>
             </div>
+
+            <!-- Logout Button -->
+            <button class="logout-btn" onclick="logout()">Logout</button>
         </div>
 
         <h1>Admin Dashboard</h1>
@@ -156,15 +174,15 @@
         <!-- Stats Section -->
         <div class="stats-box">
             <div class="stat">
-                <h3>120</h3>
+                <h3>2</h3>
                 <p>Total Users</p>
             </div>
             <div class="stat">
-                <h3>350</h3>
+                <h3>2</h3>
                 <p>Total Records Views</p>
             </div>
             <div class="stat">
-                <h3>10</h3>
+                <h3>2</h3>
                 <p>Active Admins</p>
             </div>
         </div>
@@ -189,21 +207,21 @@
             <tbody>
                 <tr>
                     <td>1</td>
-                    <td>John Mark</td>
+                    <td>John Mark Ibarra</td>
                     <td>johnmark@example.com</td>
-                    <td>+1234567890</td>
+                    <td>639123456789</td>
                     <td>
-                        45
+                        0
                         <button class="btn-view-records" onclick="viewAllRecords(1)">View All Records</button>
                     </td>
                 </tr>
                 <tr>
                     <td>2</td>
-                    <td>Jane Smith</td>
-                    <td>janesmith@example.com</td>
-                    <td>+0987654321</td>
+                    <td>Sofia Smith</td>
+                    <td>sofiasmith@example.com</td>
+                    <td>0987654321</td>
                     <td>
-                        30
+                        0
                         <button class="btn-view-records" onclick="viewAllRecords(2)">View All Records</button>
                     </td>
                 </tr>
@@ -212,8 +230,9 @@
     </div>
 
     <script type="module">
-        import { filterByUserId, viewAllRecords } from './dashboard.mjs';
-        // Now, the imported functions will be triggered by the HTML buttons
+        // Import the logout function from the external module
+        import { logout } from './dashboard.mjs';
     </script>
+
 </body>
 </html>

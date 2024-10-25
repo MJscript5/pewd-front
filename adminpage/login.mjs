@@ -1,62 +1,35 @@
-// Import Firebase modules
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+// login.mjs
 
-// Firebase configuration
-const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_AUTH_DOMAIN",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_STORAGE_BUCKET",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-    appId: "YOUR_APP_ID",
-    databaseURL: "YOUR_DATABASE_URL",
-};
+// Function to handle form submission
+export function handleLoginFormSubmission(event) {
+    event.preventDefault();  // Prevent form from submitting in the default way
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-const auth = getAuth(app);
-
-// Handle form submission
-const loginForm = document.getElementById('login-form');
-
-loginForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const email = document.getElementById('E-mail').value;
+    const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
 
-    try {
-        // Sign in using Firebase Authentication
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
-
-        // Show success message
-        document.querySelector('.login-message').textContent = "Login successful!";
-        document.querySelector('.login-message').classList.add('success');
-        document.querySelector('.login-message').style.display = "block";
-
-        // Redirect to admin dashboard (change URL accordingly)
-        window.location.href = "/admin-dashboard.html";
-    } catch (error) {
-        // Handle errors here
-        document.querySelector('.login-message').textContent = "Login failed. Please check your credentials.";
-        document.querySelector('.login-message').style.display = "block";
-    }
-});
-
-// Toggle password visibility
-export function togglePasswordVisibility() {
-    const passwordInput = document.getElementById("password");
-    const toggleIcon = document.getElementById("toggle-password-icon");
-
-    if (passwordInput.type === "password") {
-        passwordInput.type = "text";
-        toggleIcon.classList.replace('bx-hide', 'bx-show');
+    // Simulated login logic (replace with real validation, API call, etc.)
+    if (username === "admin" && password === "admin") {
+        // On successful login, redirect to the dashboard
+        window.location.href = 'dashboard.html';
     } else {
-        passwordInput.type = "password";
-        toggleIcon.classList.replace('bx-show', 'bx-hide');
+        // Display error message
+        const messageBox = document.querySelector('.login-message');
+        messageBox.textContent = 'Invalid username or password';
+        messageBox.style.color = 'red';
+    }
+}
+
+// Function to toggle password visibility
+export function togglePasswordVisibility() {
+    const passwordField = document.getElementById('password');
+    const toggleIcon = document.getElementById('toggle-password-icon');
+    if (passwordField.type === 'password') {
+        passwordField.type = 'text';
+        toggleIcon.classList.remove('bx-hide');
+        toggleIcon.classList.add('bx-show');
+    } else {
+        passwordField.type = 'password';
+        toggleIcon.classList.remove('bx-show');
+        toggleIcon.classList.add('bx-hide');
     }
 }

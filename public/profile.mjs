@@ -1,26 +1,33 @@
-import { db } from "./app.mjs";
+import { db, auth } from "./app.mjs";
+import { ref, get, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { checkAuth, redirectToLogin } from "./auth.mjs";
-import { ref, get, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const DEFAULT_PROFILE_ICON_SVG = 'data:image/svg+xml;base64,' + btoa(`
+    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
+      <path fill="black" d="M12 2a5 5 0 1 0 5 5a5 5 0 0 0-5-5m0 8a3 3 0 1 1 3-3a3 3 0 0 1-3 3m9 11v-1a7 7 0 0 0-7-7h-4a7 7 0 0 0-7 7v1h2v-1a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5v1z" />
+    </svg>`);
 
 let currentUser = null;
 let isEditing = false;
 
 document.addEventListener('DOMContentLoaded', async () => {
-  try {
-      const user = await checkAuth();  // Use checkAuth to verify if the user is logged in
-      const username = sessionStorage.getItem('username');
+    const profilePicture = document.getElementById('profile-picture');
+    profilePicture.src = DEFAULT_PROFILE_ICON_SVG;
+    try {
+        const user = await checkAuth();  // Use checkAuth to verify if the user is logged in
+        const username = sessionStorage.getItem('username');
 
-      if (username) {
-          fetchUserData(username);  // Fetch user data based on the stored username
-      } else {
-          console.error('No username found in sessionStorage.');
-          redirectToLogin();  // Redirect to login if no username is found
-      }
-  } catch (error) {
-      console.error('User is not authenticated:', error);
-      redirectToLogin();  // Redirect to login if no user is authenticated
-  }
+        if (username) {
+            fetchUserData(username);  // Fetch user data based on the stored username
+        } else {
+            console.error('No username found in sessionStorage.');
+            redirectToLogin();  // Redirect to login if no username is found
+        }
+    } catch (error) {
+        console.error('User is not authenticated:', error);
+        redirectToLogin();  // Redirect to login if no user is authenticated
+    }
 });
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -46,6 +53,10 @@ async function fetchUserData(username) {
           if (matchedUser) {
               const [userId, userData] = matchedUser;
               sessionStorage.setItem('userId', userId);  // Store userId for further use
+
+              if(userData.profilePicture) {
+                    document.getElementById('profile-picture').src = userData.profilePicture;
+                }
               populateUserProfile(userData, userId);
           } else {
               console.error('No user data found for the provided username.');
@@ -64,8 +75,7 @@ function populateUserProfile(userData, userId) {
   document.getElementById('user-email').textContent = userData.email;
   document.getElementById('phone-number').value = userData.phoneNumber || '';
   document.getElementById('birthday').value = userData.birthday || '';
-  document.getElementById('profile-picture').src = userData.profilePicture || 'default-profile-picture-url';
-
+  
   // Check email and phone verification statuses
   const user = auth.currentUser;  // Firebase auth current user
   checkEmailVerificationStatus(user);  // Check email verification status
@@ -228,13 +238,26 @@ function sendVerificationEmail() {
 }
 
 // Initialize reCAPTCHA for phone verification
-window.recaptchaVerifier = new RecaptchaVerifier('verify-phone', {
-  'size': 'invisible',
-  'callback': (response) => {
-      // reCAPTCHA solved - you can proceed with phone verification
-      startPhoneVerification();
-  }
-});
+let recaptchaVerifier;
+function initializeRecaptcha() {
+    try {
+        const auth = getAuth();
+        recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+            'size': 'invisible',
+            'callback': (response) => {
+                console.log('reCAPTCHA resolved:', response);
+                startPhoneVerification();
+            },
+            'expired-callback': () => {
+                console.error('reCAPTCHA expired, Please try again.');
+            }
+        });
+    } catch (error) {
+        console.error('Error initializing reCAPTCHA:', error);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', initializeRecaptcha);
 
 // Show verify phone button if phone is not verified
 function checkPhoneVerificationStatus(phoneVerified) {
