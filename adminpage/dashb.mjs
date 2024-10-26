@@ -1,49 +1,91 @@
-// dashboard.mjs
+// dashb.mjs
 
-// Data structure to store record views for each user
-let userRecords = {
-  1: { fullName: "John Mark Ibarra", email: "johnmark@example.com", phoneNumber: "+1234567890", recordViews: 0 },
-  2: { fullName: "Sofia Smith", email: "sofiasmith@example.com", phoneNumber: "+0987654321", recordViews: 0 }
-};
+// Function to handle user logout
+export function logout() {
+  try {
+      // Remove authentication token from localStorage or sessionStorage
+      localStorage.removeItem('authToken');
+      sessionStorage.clear();
+
+      // Optionally, make an API call to invalidate the session on the server
+      /*
+      fetch('/api/logout', {
+          method: 'POST',
+          headers: {
+              'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+              'Content-Type': 'application/json'
+          }
+      }).then(response => {
+          if (response.ok) {
+              // Successful logout, redirect to login page
+              window.location.href = './login.html';
+          } else {
+              console.error('Failed to log out.');
+          }
+      }).catch(error => {
+          console.error('Error logging out:', error);
+      });
+      */
+
+      // Redirect to the login page
+      window.location.href = './in.html';
+  } catch (error) {
+      console.error('Error during logout:', error);
+  }
+}
 
 // Function to filter user records by user ID
 export function filterByUserId() {
-  const userIdInput = document.getElementById('userIdInput').value.trim();
-  const rows = document.querySelectorAll('table tbody tr');
+  const userId = document.getElementById('userIdInput').value.trim();
 
-  rows.forEach(row => {
-      const userId = row.querySelector('td').innerText;
-      if (userIdInput && userId !== userIdInput) {
-          row.style.display = 'none';
-      } else {
-          row.style.display = '';
-      }
-  });
-}
-
-// Function to view all records of a specific user by ID
-export function viewAllRecords(userId) {
-  if (userRecords[userId]) {
-      // Increment the record view count
-      userRecords[userId].recordViews += 1;
-
-      // Update the display of record views in the table
-      const recordViewsCell = document.querySelector(`tbody tr:nth-child(${userId}) td:nth-child(5)`);
-      recordViewsCell.innerHTML = `${userRecords[userId].recordViews} <button class="btn-view-records" onclick="viewAllRecords(${userId})">View All Records</button>`;
-
-      // Simulate displaying user record details (can be expanded)
-      alert(`User: ${userRecords[userId].fullName}\nEmail: ${userRecords[userId].email}\nPhone: ${userRecords[userId].phoneNumber}\nRecords Viewed: ${userRecords[userId].recordViews}`);
-  } else {
-      alert("User not found.");
+  if (userId === "") {
+      alert("Please enter a valid User ID.");
+      return;
   }
-}
-// Function to handle logout
-export function logout() {
-  // Clear session-related data (if using sessionStorage or localStorage)
-  sessionStorage.clear();  // Clear the session storage
-  localStorage.removeItem('authToken');  // Remove auth token from localStorage (if used)
 
-  // Redirect the user to the login page
-  window.location.href = 'login.html';
+  // Filter logic here, e.g., fetch data from an API or filter table records
+  console.log(`Filtering records for User ID: ${userId}`);
+  
+  // Example fetch for filtered data (assuming an API exists)
+  /*
+  fetch(`/api/users/${userId}/records`, {
+      method: 'GET',
+      headers: {
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+          'Content-Type': 'application/json'
+      }
+  })
+  .then(response => response.json())
+  .then(data => {
+      // Update the UI with filtered records
+      console.log(data);
+  })
+  .catch(error => {
+      console.error('Error fetching user records:', error);
+  });
+  */
 }
 
+// Function to handle viewing all records for a particular user
+export function viewAllRecords(userId) {
+  console.log(`Viewing all records for User ID: ${userId}`);
+
+  // Example logic for viewing user records (assuming an API or client-side filtering)
+  /*
+  fetch(`/api/users/${userId}/records`, {
+      method: 'GET',
+      headers: {
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+          'Content-Type': 'application/json'
+      }
+  })
+  .then(response => response.json())
+  .then(data => {
+      // Display records in the table or a modal
+      console.log(data);
+  })
+  .catch(error => {
+      console.error('Error fetching records:', error);
+  });
+  */
+}

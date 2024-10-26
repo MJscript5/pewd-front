@@ -82,6 +82,7 @@ function setupLogoutButton() {
         logoutButton.addEventListener('click', () => {
             auth.signOut().then(() => {
                 redirectToLogin();
+                clearStorage();
             }).catch((error) => {
                 console.error('Error signing out:', error);
             });
@@ -89,4 +90,9 @@ function setupLogoutButton() {
     }
 }
 
+// Function to clear storage
+function clearStorage() {
+    sessionStorage.clear();
+    localStorage.clear();
+}
 updateData();

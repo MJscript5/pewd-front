@@ -1,4 +1,4 @@
-// login.mjs
+// in.mjs
 
 // Function to handle form submission
 export function handleLoginFormSubmission(event) {
@@ -10,7 +10,7 @@ export function handleLoginFormSubmission(event) {
     // Simulated login logic (replace with real validation, API call, etc.)
     if (username === "admin" && password === "admin") {
         // On successful login, redirect to the dashboard
-        window.location.href = 'dashboard.html';
+        window.location.href = 'dashb.html';
     } else {
         // Display error message
         const messageBox = document.querySelector('.login-message');

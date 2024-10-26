@@ -1,3 +1,5 @@
+
+
 import { db, auth } from "./app.mjs";
 import { ref, get, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -28,6 +30,82 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error('User is not authenticated:', error);
         redirectToLogin();  // Redirect to login if no user is authenticated
     }
+});
+
+// Initialize reCAPTCHA for phone verification
+let recaptchaVerifier;
+function initializeRecaptcha() {
+    try {
+        const auth = getAuth();
+        recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+            'size': 'invisible',
+            'callback': (response) => {
+                console.log('reCAPTCHA resolved:', response);
+                startPhoneVerification();
+            },
+            'expired-callback': () => {
+                console.error('reCAPTCHA expired, Please try again.');
+            }
+        });
+    } catch (error) {
+        console.error('Error initializing reCAPTCHA:', error);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', initializeRecaptcha);
+
+// Start phone verification process
+function startPhoneVerification() {
+    const phoneNumber = document.getElementById('phone-number').value;
+
+    signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier)
+        .then((confirmationResult) => {
+            window.confirmationResult = confirmationResult;
+            document.getElementById('verification-code-container').style.display = 'block';
+            alert('Verification code sent to your phone.');
+        })
+        .catch((error) => {
+            console.error('Error sending verification code:', error);
+            alert('Failed to send verification code. Please try again.');
+        });
+}
+
+// Confirm phone verification code
+function confirmVerificationCode() {
+    const code = document.getElementById('verification-code').value;
+    window.confirmationResult.confirm(code)
+    .then((result) => {
+        alert('Phone number verified successfully!');
+        // Optionally update Firebase to indicate phone is verified
+        const userId = sessionStorage.getItem('userId');
+        update(ref(db, `users/${userId}`), { phoneVerified: true });
+        checkPhoneVerificationStatus(true);  // Update UI to show phone is verified
+        document.getElementById('verification-code-container').style.display = 'none';
+    })
+    .catch((error) => {
+        console.error('Error verifying code:', error);
+        alert('Invalid verification code. Please try again.');
+    });
+}
+
+// Function to check phone verification status and update UI
+function checkPhoneVerificationStatus(isVerified) {
+    const verifyPhoneButton = document.getElementById('verify-phone-button');
+    if (verifyPhoneButton) {
+        if (isVerified) {
+        verifyPhoneButton.style.display = 'none';  // Hide verify button if verified
+        } else {
+        verifyPhoneButton.style.display = 'inline-block';  // Show verify button if not verified
+        }
+    }
+}
+document.addEventListener('DOMContentLoaded', (event) => {
+    const verifyPhoneButton = document.getElementById('verify-phone-button');
+    if (verifyPhoneButton) {
+        verifyPhoneButton.addEventListener('click', startPhoneVerification);
+    } else {
+        console.error('Element with ID "verify-phone-button" not found.');
+    }  
 });
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -236,78 +314,4 @@ function sendVerificationEmail() {
           });
   }
 }
-
-// Initialize reCAPTCHA for phone verification
-let recaptchaVerifier;
-function initializeRecaptcha() {
-    try {
-        const auth = getAuth();
-        recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-            'size': 'invisible',
-            'callback': (response) => {
-                console.log('reCAPTCHA resolved:', response);
-                startPhoneVerification();
-            },
-            'expired-callback': () => {
-                console.error('reCAPTCHA expired, Please try again.');
-            }
-        });
-    } catch (error) {
-        console.error('Error initializing reCAPTCHA:', error);
-    }
-}
-
-document.addEventListener('DOMContentLoaded', initializeRecaptcha);
-
-// Show verify phone button if phone is not verified
-function checkPhoneVerificationStatus(phoneVerified) {
-  const verifyPhoneButton = document.getElementById('verify-phone');
-  const phoneVerificationStatus = document.getElementById('phone-verification-status');
-
-  if (phoneVerified) {
-      phoneVerificationStatus.textContent = 'Phone Verified';
-      phoneVerificationStatus.style.color = 'green';
-      verifyPhoneButton.style.display = 'none';  // Hide verify button if already verified
-  } else {
-      phoneVerificationStatus.textContent = 'Phone Not Verified';
-      phoneVerificationStatus.style.color = 'red';
-      verifyPhoneButton.style.display = 'inline-block';  // Show verify button if not verified
-  }
-}
-
-// Start phone verification process
-function startPhoneVerification() {
-  const phoneNumber = document.getElementById('phone-number').value;
-  const appVerifier = window.recaptchaVerifier;
-
-  signInWithPhoneNumber(auth, phoneNumber, appVerifier)
-      .then((confirmationResult) => {
-          window.confirmationResult = confirmationResult;
-          document.getElementById('verification-code-container').style.display = 'block';
-          alert('Verification code sent to your phone.');
-      })
-      .catch((error) => {
-          console.error('Error sending verification code:', error);
-          alert('Failed to send verification code. Please try again.');
-      });
-}
-
-// Confirm phone verification code
-function confirmVerificationCode() {
-  const code = document.getElementById('verification-code').value;
-  window.confirmationResult.confirm(code)
-      .then((result) => {
-          alert('Phone number verified successfully!');
-          // Optionally update Firebase to indicate phone is verified
-          const userId = sessionStorage.getItem('userId');
-          update(ref(db, `users/${userId}`), { phoneVerified: true });
-          checkPhoneVerificationStatus(true);  // Update UI to show phone is verified
-          document.getElementById('verification-code-container').style.display = 'none';
-      })
-      .catch((error) => {
-          console.error('Error verifying code:', error);
-          alert('Invalid verification code. Please try again.');
-      });
-}
-
-
+    

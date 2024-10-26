@@ -57,15 +57,16 @@
         <div class="block editable">
             <p>Phone Number:</p>
             <input type="tel" id="phone-number" disabled>
-            <button id="verify-phone" class="verify-button" style="display: none;">
+            <button id="verify-phone-button" class="verify-button" style="display: none;">
                 Verify Phone
             </button>
             <p id="phone-verification-status" class="verification-status"></p>
         </div>
+        <div id="recaptcha-container"></div>
         
         <div id="verification-code-container" style="display: none;">
             <input type="text" id="verification-code" placeholder="Enter verification code">
-            <button id="confirm-verification-code">Confirm Code</button>
+            <button onclick="confirmVerificationCode()">Confirm Code</button>
         </div>        
 
         <div class="block editable">

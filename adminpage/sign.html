@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up & Login Form</title>
+    <title>Sign Up</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -48,7 +48,7 @@
         }
 
         .form-group input {
-            width: 100%;
+            width: 95%;
             padding: 8px;
             border: 1px solid #ccc;
             border-radius: 4px;
@@ -109,25 +109,7 @@
             <p class="error-message" id="signup-error-message"></p>
             <p class="success-message" id="signup-success-message"></p>
         </form>
-        <p>Already have an account? <a href="#" id="switch-to-login">Log In</a></p>
-    </div>
-
-    <div class="container" id="login-container" style="display: none;">
-        <img src="pics/logo.png" alt="Logo" class="logo">
-        <h2>Login</h2>
-        <form id="login-form">
-            <div class="form-group">
-                <label for="login-email">Email</label>
-                <input type="email" id="login-email" required>
-            </div>
-            <div class="form-group">
-                <label for="login-password">Password</label>
-                <input type="password" id="login-password" required>
-            </div>
-            <button type="submit" class="form-button">Log In</button>
-            <p class="error-message" id="login-error-message"></p>
-        </form>
-        <p>Don't have an account? <a href="#" id="switch-to-signup">Sign Up</a></p>
+        <p>Already have an account? <a href="in.html" id="switch-to-login">Log In</a></p>
     </div>
 
     <script>
@@ -135,11 +117,6 @@
         document.getElementById("switch-to-login").addEventListener("click", function () {
             document.getElementById("signup-container").style.display = "none";
             document.getElementById("login-container").style.display = "block";
-        });
-
-        document.getElementById("switch-to-signup").addEventListener("click", function () {
-            document.getElementById("signup-container").style.display = "block";
-            document.getElementById("login-container").style.display = "none";
         });
 
         // Sign Up Logic
@@ -171,31 +148,8 @@
 
             setTimeout(() => {
                 document.getElementById("signup-container").style.display = "none";
-                document.getElementById("login-container").style.display = "block";
+                window.location.href = 'in.html'; // Redirect to login page after successful signup
             }, 1500);
-        });
-
-        // Login Logic
-        document.getElementById("login-form").addEventListener("submit", function (e) {
-            e.preventDefault();
-
-            const email = document.getElementById("login-email").value;
-            const password = document.getElementById("login-password").value;
-            const errorMessage = document.getElementById("login-error-message");
-
-            errorMessage.style.display = "none";
-
-            // Retrieve user data from localStorage
-            const user = JSON.parse(localStorage.getItem(email));
-
-            if (!user || user.password !== password) {
-                errorMessage.innerText = "Invalid email or password!";
-                errorMessage.style.display = "block";
-                return;
-            }
-
-            alert("Login successful!");
-            // Optionally redirect or show logged-in content
         });
     </script>
 </body>
