@@ -90,28 +90,48 @@ function generateUniqueId() {
 
 let lastPosture = null;
 
-console.log('Last Posture:', lastPosture);
+function fetchLastPosture() {
+    return new Promise((resolve, reject) => {
+        const lastPostureRef = ref(db, '/Sensor/LastPosture');
+        onValue(lastPostureRef, (snapshot) => {
+            if (snapshot.exists()) {
+                lastPosture = snapshot.val();
+                resolve(lastPosture);
+            } else {
+                resolve(null);
+            }
+        }, (error) => {
+            reject(error);
+        });
+    });
+}
 
 function watchPostureChanges() {
     const postureRef = ref(db, '/Sensor/Posture');
 
-    onValue(postureRef, (snapshot) => {
-        if (snapshot.exists()) {
-            const postureData = snapshot.val();
-            const now = new Date();
-            const date = now.toLocaleDateString();
-            const time = now.toLocaleTimeString('en-US', { hour12: false, timeZone: 'Asia/Manila' });
+    fetchLastPosture().then(() => {
+        onValue(postureRef, (snapshot) => {
+            if (snapshot.exists()) {
+                const postureData = snapshot.val();
+                const now = new Date();
+                const date = now.toLocaleDateString();
+                const time = now.toLocaleTimeString('en-US', { hour12: false, timeZone: 'Asia/Manila' });
 
-            console.log('Current Posture:', postureData);
+                console.log('Current Posture:', postureData);
 
-            // Check if the posture has changed compared to the last known posture
-            if (postureData !== lastPosture) {
-                addNewRecord(postureData, date, time);
+                // Check if the posture has changed from "good" to "bad" or vice versa
+                if ((lastPosture === 'Good Posture!' && postureData === 'Bad Posture Detected!') || (lastPosture === 'Bad Posture Detected!' && postureData === 'Good Posture!')) {
+                    addNewRecord(postureData, date, time);
+                    // Update the last posture in the database
+                    set(ref(db, '/Sensor/LastPosture'), postureData);
+                }
                 lastPosture = postureData; // Update the lastPosture to the current one
             }
-        }
-    }, (error) => {
-        console.error('Error fetching posture data:', error);
+        }, (error) => {
+            console.error('Error fetching posture data:', error);
+        });
+    }).catch((error) => {
+        console.error('Error fetching last posture:', error);
     });
 }
 

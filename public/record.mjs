@@ -34,7 +34,7 @@ function timeAgo(dateString) {
     }
 }
 
-function fetchRecords(sortOrder = 'time_asc') {
+function fetchRecords(sortOrder = 'time_desc') {
     const recordsRef = ref(db, 'Sensor/Record');
 
     onValue(recordsRef, (snapshot) => {
@@ -96,7 +96,6 @@ function fetchRecords(sortOrder = 'time_asc') {
     });
 }
 
-
 // Function to handle sorting based on user selection
 function fetchDataChanges() {
     const sortOption = document.getElementById('sort').value;
@@ -108,5 +107,6 @@ window.fetchDataChanges = fetchDataChanges;
 
 // Call fetchDataChanges on page load to display records with default sorting
 document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('sort').value = 'time_desc'; // Set default sort option to "time_desc"
     fetchDataChanges();
 });

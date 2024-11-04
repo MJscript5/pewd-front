@@ -1,5 +1,3 @@
-
-
 import { db, auth } from "./app.mjs";
 import { ref, get, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -32,93 +30,113 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
-// Initialize reCAPTCHA for phone verification
-let recaptchaVerifier;
-function initializeRecaptcha() {
-    try {
-        const auth = getAuth();
-        recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-            'size': 'invisible',
-            'callback': (response) => {
-                console.log('reCAPTCHA resolved:', response);
-                startPhoneVerification();
-            },
-            'expired-callback': () => {
-                console.error('reCAPTCHA expired, Please try again.');
-            }
-        });
-    } catch (error) {
-        console.error('Error initializing reCAPTCHA:', error);
-    }
-}
+// // Initialize reCAPTCHA for phone verification
+// let recaptchaVerifier;
+// function initializeRecaptcha() {
+//     try {
+//         const auth = getAuth();
+//         recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+//             'size': 'invisible',
+//             'callback': (response) => {
+//                 console.log('reCAPTCHA resolved:', response);
+//                 startPhoneVerification();
+//             },
+//             'expired-callback': () => {
+//                 console.error('reCAPTCHA expired, Please try again.');
+//             }
+//         });
+//     } catch (error) {
+//         console.error('Error initializing reCAPTCHA:', error);
+//     }
+// }
 
-document.addEventListener('DOMContentLoaded', initializeRecaptcha);
+// document.addEventListener('DOMContentLoaded', initializeRecaptcha);
 
-// Start phone verification process
-function startPhoneVerification() {
-    const phoneNumber = document.getElementById('phone-number').value;
+// // Start phone verification process
+// function startPhoneVerification() {
+//     const phoneNumber = document.getElementById('phone-number').value;
 
-    signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier)
-        .then((confirmationResult) => {
-            window.confirmationResult = confirmationResult;
-            document.getElementById('verification-code-container').style.display = 'block';
-            alert('Verification code sent to your phone.');
-        })
-        .catch((error) => {
-            console.error('Error sending verification code:', error);
-            alert('Failed to send verification code. Please try again.');
-        });
-}
+//     signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier)
+//         .then((confirmationResult) => {
+//             window.confirmationResult = confirmationResult;
+//             document.getElementById('verification-code-container').style.display = 'block';
+//             alert('Verification code sent to your phone.');
+//         })
+//         .catch((error) => {
+//             console.error('Error sending verification code:', error);
+//             alert('Failed to send verification code. Please try again.');
+//         });
+// }
 
-// Confirm phone verification code
-function confirmVerificationCode() {
-    const code = document.getElementById('verification-code').value;
-    window.confirmationResult.confirm(code)
-    .then((result) => {
-        alert('Phone number verified successfully!');
-        // Optionally update Firebase to indicate phone is verified
-        const userId = sessionStorage.getItem('userId');
-        update(ref(db, `users/${userId}`), { phoneVerified: true });
-        checkPhoneVerificationStatus(true);  // Update UI to show phone is verified
-        document.getElementById('verification-code-container').style.display = 'none';
-    })
-    .catch((error) => {
-        console.error('Error verifying code:', error);
-        alert('Invalid verification code. Please try again.');
-    });
-}
+// // Confirm phone verification code
+// function confirmVerificationCode() {
+//     const code = document.getElementById('verification-code').value;
+//     window.confirmationResult.confirm(code)
+//     .then((result) => {
+//         alert('Phone number verified successfully!');
+//         // Optionally update Firebase to indicate phone is verified
+//         const userId = sessionStorage.getItem('userId');
+//         update(ref(db, `users/${userId}`), { phoneVerified: true });
+//         checkPhoneVerificationStatus(true);  // Update UI to show phone is verified
+//         document.getElementById('verification-code-container').style.display = 'none';
+//     })
+//     .catch((error) => {
+//         console.error('Error verifying code:', error);
+//         alert('Invalid verification code. Please try again.');
+//     });
+// }
 
-// Function to check phone verification status and update UI
-function checkPhoneVerificationStatus(isVerified) {
-    const verifyPhoneButton = document.getElementById('verify-phone-button');
-    if (verifyPhoneButton) {
-        if (isVerified) {
-        verifyPhoneButton.style.display = 'none';  // Hide verify button if verified
-        } else {
-        verifyPhoneButton.style.display = 'inline-block';  // Show verify button if not verified
-        }
-    }
-}
-document.addEventListener('DOMContentLoaded', (event) => {
-    const verifyPhoneButton = document.getElementById('verify-phone-button');
-    if (verifyPhoneButton) {
-        verifyPhoneButton.addEventListener('click', startPhoneVerification);
-    } else {
-        console.error('Element with ID "verify-phone-button" not found.');
-    }  
-});
+// // Function to check phone verification status and update UI
+// function checkPhoneVerificationStatus(isVerified) {
+//     const verifyPhoneButton = document.getElementById('verify-phone-button');
+//     if (verifyPhoneButton) {
+//         if (isVerified) {
+//         verifyPhoneButton.style.display = 'none';  // Hide verify button if verified
+//         } else {
+//         verifyPhoneButton.style.display = 'inline-block';  // Show verify button if not verified
+//         }
+//     }
+// }
+// document.addEventListener('DOMContentLoaded', (event) => {
+//     const verifyPhoneButton = document.getElementById('verify-phone-button');
+//     if (verifyPhoneButton) {
+//         verifyPhoneButton.addEventListener('click', startPhoneVerification);
+//     } else {
+//         console.error('Element with ID "verify-phone-button" not found.');
+//     }  
+// });
 
 document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('verify-email').addEventListener('click', sendVerificationEmail);
-  document.getElementById('verify-phone').addEventListener('click', startPhoneVerification);
-  document.getElementById('confirm-verification-code').addEventListener('click', confirmVerificationCode);
-  document.getElementById('edit-profile').addEventListener('click', toggleEditMode);
-  document.getElementById('save-changes').addEventListener('click', saveChanges);
-  document.getElementById('profile-picture-input').addEventListener('change', handleFileUpload);
-  document.getElementById('camera-button').addEventListener('click', openCameraModal);
-  document.getElementById('capture-photo').addEventListener('click', capturePhoto);
-  document.getElementById('close-camera-modal').addEventListener('click', closeCameraModal);
+    document.getElementById('verify-email').addEventListener('click', sendVerificationEmail);
+//   document.getElementById('verify-phone').addEventListener('click', startPhoneVerification);
+//   document.getElementById('confirm-verification-code').addEventListener('click', confirmVerificationCode);
+    document.getElementById('edit-profile').addEventListener('click', toggleEditMode);
+    document.getElementById('save-changes').addEventListener('click', saveChanges);
+    document.getElementById('cancel-changes').addEventListener('click', cancelChanges);
+    document.getElementById('profile-picture-input').addEventListener('change', handleFileUpload);
+    document.getElementById('camera-button').addEventListener('click', openCameraModal);
+    document.getElementById('capture-photo').addEventListener('click', capturePhoto);
+    document.getElementById('close-camera-modal').addEventListener('click', closeCameraModal);
+
+    document.getElementById('phone-number').addEventListener('keydown', handleEnterKey);
+    document.getElementById('birthday').addEventListener('keydown', handleEnterKey);
 });
+
+function handleEnterKey(event) {
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    saveChanges();
+  }
+}
+
+function cancelChanges() {
+    // Revert changes by re-fetching user data
+    const username = sessionStorage.getItem('username');
+    if (username) {
+      fetchUserData(username);
+    }
+    toggleEditMode();  // Exit edit mode
+  }
 
 async function fetchUserData(username) {
   const usersRef = ref(db, 'users');
@@ -157,7 +175,7 @@ function populateUserProfile(userData, userId) {
   // Check email and phone verification statuses
   const user = auth.currentUser;  // Firebase auth current user
   checkEmailVerificationStatus(user);  // Check email verification status
-  checkPhoneVerificationStatus(userData.phoneVerified);  // Check phone verification status
+//   checkPhoneVerificationStatus(userData.phoneVerified);  // Check phone verification status
 }
 
 // Toggle edit/save mode
@@ -167,12 +185,13 @@ function toggleEditMode() {
   document.getElementById('birthday').disabled = !isEditing;
   document.getElementById('edit-profile').style.display = isEditing ? 'none' : 'block';
   document.getElementById('save-changes').style.display = isEditing ? 'block' : 'none';
+  document.getElementById('cancel-changes').style.display = isEditing ? 'block' : 'none';
 }
 
 async function saveChanges() {
   const userId = sessionStorage.getItem('userId');
   const updatedData = {
-      phone: document.getElementById('phone-number').value,
+      phoneNumber: document.getElementById('phone-number').value,
       birthday: document.getElementById('birthday').value
   };
 
@@ -198,8 +217,8 @@ function handleFileUpload(event) {
 
       const reader = new FileReader();
       reader.onload = function(e) {
-          document.getElementById('profile-picture').src = e.target.result;  // Display the image
-          updateProfilePicture(e.target.result);  // Save image URL to Firebase
+          document.getElementById('profile-picture').src = e.target.result; 
+          updateProfilePicture(e.target.result);
       };
       reader.readAsDataURL(file);
   }
@@ -314,4 +333,4 @@ function sendVerificationEmail() {
           });
   }
 }
-    
+
