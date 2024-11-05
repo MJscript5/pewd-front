@@ -8,6 +8,15 @@ body {
     margin: 0;
     padding: 20px;
     box-sizing: border-box;
+    opacity: 0;
+    animation: fadeIn 0.5s forwards;
+    transition: opacity 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+    }
 }
 
 .profile {
@@ -19,6 +28,12 @@ body {
     text-align: center;
     padding: 20px;
     position: relative;
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.profile:hover {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transform: translateY(-5px);
 }
 
 .header {
@@ -77,6 +92,11 @@ body {
     align-items: center;
     cursor: pointer;
     font-size: 16px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.upload-button:hover, #camera-button:hover {
+    transform: translateY(-2px);
 }
 
 .block {
@@ -199,5 +219,43 @@ body {
     .back-button {
         top: 15px;
         left: 15px;
+    }
+}
+
+/* Extra small screens (less than 480px) */
+@media (max-width: 320px) {
+    .profile {
+        padding: 10px;
+    }
+
+    .back-button {
+        top: 10px;
+        left: 10px;
+    }
+
+    .profile h1 {
+        font-size: 20px;
+    }
+
+    .profile-picture-container {
+        width: 80px;
+        height: 80px;
+    }
+
+    .upload-button, #camera-button {
+        width: 25px;
+        height: 25px;
+    }
+
+    .block h2 {
+        font-size: 18px;
+    }
+
+    .block p {
+        font-size: 14px;
+    }
+
+    .verify-button, .save-button {
+        font-size: 12px;
     }
 }

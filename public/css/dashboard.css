@@ -11,8 +11,17 @@ body {
     flex-direction: column;
     align-items: center;
     min-height: 100vh;
-    background: #285483;
+    background: linear-gradient(135deg, #285483, #3b6ba5);
     color: #ababab;
+    transition: background 0.5s ease-in-out;
+    opacity: 0;
+    animation: fadeIn 0.5s forwards;
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+    }
 }
 
 .header {
@@ -21,12 +30,18 @@ body {
     left: 0;
     padding: 1vw 2vw;
     width: 100%;
-    background-color: black;
+    background-color: rgba(0, 0, 0, 0.8);
     display: flex;
     justify-content: space-between;
     align-items: center;
     z-index: 100;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease-in-out;
+    transition: background-color 0.3s ease;
+}
+
+.header:hover {
+    background-color: rgba(0, 0, 0, 1);
 }
 
 .tabs {
@@ -36,6 +51,7 @@ body {
     align-items: center;
     width: 100%;
     padding: 1rem;
+    transition: margin-top 0.3s ease-in-out;
 }
 
 .buttons {
@@ -49,11 +65,13 @@ body {
     margin-bottom: 0.5rem;
     border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s, transform 0.3s;
+    transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
 .buttons:hover {
     background-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-5px);
 }
 
 .buttons:first-child {
@@ -73,6 +91,7 @@ body {
     justify-content: center;
     margin-bottom: 20px;
     font-size: 24px;
+    transition: font-size 0.3s ease-in-out;
 }
 
 #postureStatusIcon {
@@ -89,16 +108,11 @@ body {
     margin-top: 1.25rem;
     font-size: 1.25rem;
     text-align: center;
+    transition: font-size 0.3s ease-in-out;
+    border-radius: 5px;
+    transition: background-color 0.3s ease-in-out;
 }
 
-.bad {
-    color: red;
-    font-weight: bold; 
-    font-size: 18px; 
-    background-color: rgba(255, 255, 255, 0.4);    
-    padding: 5px 10px; 
-    border-radius: 5px;
-}
 .good {
     color: #008000;
     font-weight: bold; 
@@ -106,6 +120,7 @@ body {
     background-color: rgba(255, 255, 255, 0.4);    
     padding: 5px 10px; 
     border-radius: 5px;
+    transition: background-color 0.3s ease-in-out;
 }
 
 @media (max-width: 1024px) {
@@ -134,6 +149,16 @@ body {
     .tabs {
         margin-top: 4rem;
     }
+
+    .buttons {
+        padding: 0.875rem 1.25rem;
+        font-size: 1rem;
+        width: 85%;
+    }
+
+    .additional-content {
+        font-size: 1rem;
+    }
 }
 
 @media (max-width: 480px) {
@@ -153,5 +178,26 @@ body {
 
     .additional-content {
         font-size: 0.875rem;
+    }
+}
+
+/* Extra small screens (less than 480px) */
+@media (max-width: 320px) {
+    .header {
+        padding: 0.5rem 1rem;
+    }
+
+    .tabs {
+        margin-top: 2.5rem;
+    }
+
+    .buttons {
+        padding: 0.5rem 1rem;
+        font-size: 0.75rem;
+        width: 90%;
+    }
+
+    .additional-content {
+        font-size: 0.75rem;
     }
 }

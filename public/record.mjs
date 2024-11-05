@@ -72,17 +72,17 @@ function fetchRecords(sortOrder = 'time_desc') {
                 timeDurationDiv.textContent = timeAgo(recordDateTime);
                 recordDiv.appendChild(timeDurationDiv);
 
-                const dateTimeDiv = document.createElement('div');
-                dateTimeDiv.className = 'date-time';
-                dateTimeDiv.textContent = recordDateTime;
-                recordDiv.appendChild(dateTimeDiv);
-
                 const postureDiv = document.createElement('div');
                 postureDiv.className = 'posture';
                 postureDiv.textContent = record.Posture || 'N/A';
                 recordDiv.appendChild(postureDiv);
 
                 recordsContainer.appendChild(recordDiv);
+
+                const dateTimeDiv = document.createElement('div');
+                dateTimeDiv.className = 'date-time';
+                dateTimeDiv.textContent = recordDateTime;
+                recordDiv.appendChild(dateTimeDiv);
             });
         } else {
             // Handle the case where there are no records
@@ -99,7 +99,7 @@ function fetchRecords(sortOrder = 'time_desc') {
 // Function to handle sorting based on user selection
 function fetchDataChanges() {
     const sortOption = document.getElementById('sort').value;
-    fetchRecords(sortOption); // Pass the selected sorting option to fetchRecords
+    fetchRecords(sortOption); 
 }
 
 // Attach the function to the window object to make it accessible in HTML
@@ -107,6 +107,6 @@ window.fetchDataChanges = fetchDataChanges;
 
 // Call fetchDataChanges on page load to display records with default sorting
 document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('sort').value = 'time_desc'; // Set default sort option to "time_desc"
+    document.getElementById('sort').value = 'time_desc'; 
     fetchDataChanges();
 });

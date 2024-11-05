@@ -1,9 +1,23 @@
-
 body {
     font-family: "Rubik", sans-serif;
     background-color: #285483;
     margin: 0;
     padding: 0;
+    opacity: 0;
+    animation: fadeIn 0.5s forwards;
+    transition: opacity 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    to {
+        opacity: 0;
+    }
 }
 
 .header {
@@ -13,6 +27,11 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    transition: background-color 0.3s ease;
+}
+
+.header:hover {
+    background-color: #333;
 }
 
 .header a {
@@ -30,10 +49,13 @@ body {
 #sortContainer {
     display: flex;
     justify-content: flex-start;
-    align-items: left;
+    align-items: center;
     padding: 10px;
     background-color: transparent;
     border-bottom: 1px solid #ccc;
+    flex-wrap: wrap;
+    gap: 10px;
+    transition: background-color 0.3s ease;
 }
 
 #sortContainer label {
@@ -45,32 +67,50 @@ body {
     padding: 5px;
     border: 1px solid #ccc;
     border-radius: 4px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+#sort:focus {
+    border-color: #285483;
+    box-shadow: 0 0 5px rgba(40, 84, 131, 0.5);
 }
 
 /* Styles for Individual Records */
 .record {
-    background-color: #fff;
+    background-color: #ffffffc6;
     color: #1e1e1e;
-    padding: 15px;
-    margin-bottom: 10px;
+    padding: 12px;
+    margin-bottom: 15px;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     display: flex;
-    justify-content: flex-start;
+    justify-content: space-between;
     align-items: center;
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+    flex-direction: row;
+    gap: 10px;
+    position: relative;
+}
+
+.record:hover,
+.record:focus,
+.record:active {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transform: translateY(-5px);
 }
 
 .record .date-time {
-    font-size: 14px;
+    font-size: 12px;
     color: #555;
-    text-align: left;
-    flex: 1;
+    position: absolute;
+    top: 10px;
+    right: 10px;
 }
 
 .record .posture {
     font-size: 18px;
     font-weight: bold;
-    text-align: left;
+    text-align: center;
     flex: 2;
 }
 
@@ -100,6 +140,18 @@ body {
         font-size: 12px;
         text-align: left;
     }
+
+    .record .date-time {
+        text-align: right;
+        margin-left: 0;
+        position: static;
+        align-self: flex-end;
+    }
+
+    .record .posture {
+        text-align: center;
+        align-self: center;
+    }
 }
 
 @media (max-width: 480px) {
@@ -109,20 +161,52 @@ body {
     }
 
     .record {
-        padding: 10px;
-        margin: 5px 0;
+        padding: 2px;
+        margin: 2px 0;
         flex-direction: column;
         align-items: flex-start;
     }
 
     .record .posture {
-        font-size: 14px;
-        text-align: left;
+        font-size: 12px;
+        text-align: center;
+        align-self: center;
     }
 
     .record .date-time {
         font-size: 10px;
-        margin-bottom: 5px;
-        text-align: left; 
+        margin-bottom: 1px;
+        text-align: right;
+        align-self: flex-end;
+    }
+}
+
+/* Extra small screens (less than 480px) */
+@media (max-width: 320px) {
+    .record {
+        padding: 8px;
+        margin: 3px 0;
+    }
+
+    .record .posture {
+        font-size: 12px;
+    }
+
+    .record .date-time {
+        font-size: 8px;
+    }
+}
+
+@media (min-width: 769px) {
+    .record {
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .record .date-time,
+    .record .posture,
+    .record .time-duration {
+        width: auto;
+        text-align: left;
     }
 }

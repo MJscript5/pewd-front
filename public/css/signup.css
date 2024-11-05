@@ -17,6 +17,7 @@ form {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     text-align: center;
     position: relative;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 input[type="text"],
@@ -32,6 +33,7 @@ input[type="submit"] {
     border-radius: 5px;
     border: 1px solid #104f64;
     box-sizing: border-box;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 input[type="submit"] {
@@ -39,10 +41,12 @@ input[type="submit"] {
     color: white;
     border: none;
     cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
 input[type="submit"]:hover {
     background-color: #33863791;
+    transform: translateY(-2px);
 }
 
 .sign-up {
@@ -69,6 +73,7 @@ input[type="submit"]:hover {
     transform: translateY(-50%);
     right: 10px;
     cursor: pointer;
+    transition: color 0.3s ease;
 }
 
 .bx-hide {
@@ -138,5 +143,31 @@ input[type="submit"]:hover {
 
     .logo {
         width: 30px;
+    }
+}
+
+/* Extra small screens (less than 480px) */
+@media only screen and (max-width: 480px) {
+    form {
+        width: 95%;
+        padding: 10px;
+    }
+
+    input[type="text"],
+    input[type="password"],
+    input[type="email"],
+    input[type="number"],
+    input[type="date"],
+    input[type="submit"] {
+        padding: 6px;
+    }
+
+    input[type="submit"] {
+        padding: 8px;
+        font-size: 14px;
+    }
+
+    .logo {
+        width: 25px;
     }
 }

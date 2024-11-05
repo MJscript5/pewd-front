@@ -1,68 +1,40 @@
-// Function to handle user logout
-export async function logout() {
-  try {
-    // Remove authentication token from localStorage and clear sessionStorage
-    localStorage.removeItem('authToken');
-    sessionStorage.clear();
+// dashboard.mjs
 
-    // Make an API call to invalidate the session on the server
-    const response = await fetch('/api/logout', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-        'Content-Type': 'application/json'
-      }
-    });
+// Simulated records data - in a real app, this would come from an API
+const mockPostureRecords = [
+  { id: 1, userId: 1, date: '2024-01-15', postureName: 'Standing', accuracy: 95 },
+  { id: 2, userId: 1, date: '2024-01-16', postureName: 'Sitting', accuracy: 88 },
+  { id: 3, userId: 2, date: '2024-01-15', postureName: 'Walking', accuracy: 92 },
+];
 
-    if (response.ok) {
-      console.log('Logout successful');
-    } else {
-      console.error('Failed to log out on the server.');
-    }
-  } catch (error) {
-    console.error('Error during logout:', error);
-  } finally {
-    // Redirect to the login page
-    window.location.href = 'in.html';
-  }
+export function logout() {
+  // Clear all stored authentication data
+  localStorage.removeItem('authToken');
+  sessionStorage.clear();
+  
+  // Show success message
+  alert('Logged out successfully');
+
+  // Redirect to login page
+  window.location.href = './in.html';
 }
 
-// Function to filter user records by user ID
-export function filterByUserId() {
-  const userId = document.getElementById('userIdInput').value.trim();
+export function viewRecords(userId) {
+  const records = mockPostureRecords.filter(record => record.userId === parseInt(userId));
+  const modal = document.getElementById('recordsModal');
+  const content = document.getElementById('recordsContent');
 
-  if (userId === "") {
-    alert("Please enter a valid User ID.");
-    return;
+  if (records.length > 0) {
+      content.innerHTML = records.map(record => `
+          <div style="border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; border-radius: 4px;">
+              <h3>${record.postureName}</h3>
+              <p>Date: ${record.date}</p>
+              <p>Accuracy: ${record.accuracy}%</p>
+          </div>
+      `).join('');
+  } else {
+      content.innerHTML = '<p>No records found for this user.</p>';
   }
 
-  console.log(`Filtering records for User ID: ${userId}`);
-  // Implement your filtering logic here
-  // For example, you could call an API to fetch filtered records
-  // or filter an existing array of records
-}
-
-// Function to handle viewing all records for a particular user
-export async function viewAllRecords(userId) {
-  console.log(`Viewing all records for User ID: ${userId}`);
-
-  try {
-    const response = await fetch(`/api/users/${userId}/records`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-        'Content-Type': 'application/json'
-      }
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      console.log('User records:', data);
-      // Implement logic to display the records in your UI
-    } else {
-      console.error('Failed to fetch records');
-    }
-  } catch (error) {
-    console.error('Error fetching records:', error);
-  }
+  modal.style.display = 'block';
 }
