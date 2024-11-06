@@ -113,14 +113,14 @@ document.getElementById('signup-form').addEventListener('submit', async (event) 
     // Add event listener to close the modal
     closeButton.addEventListener('click', () => {
       modal.style.display = 'none';
-      window.location.href = 'index.html'; // Redirect to sign-in page
+      redirectToLogin(); // Redirect to sign-in page
     });
 
     // Close the modal if the user clicks outside of it
     window.addEventListener('click', (event) => {
       if (event.target == modal) {
         modal.style.display = 'none';
-        window.location.href = 'index.html'; // Redirect to sign-in page
+        redirectToLogin(); // Redirect to sign-in page
       }
     });
 
@@ -130,7 +130,7 @@ document.getElementById('signup-form').addEventListener('submit', async (event) 
     successMessage.setAttribute('role', 'alert');
 
     setTimeout(() => {
-      window.location.href = 'index.html'; // Redirect to sign-in page
+      redirectToLogin(); // Redirect to sign-in page
     }, 300);
 
   } catch (error) {
