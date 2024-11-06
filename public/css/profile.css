@@ -19,6 +19,12 @@ body {
     }
 }
 
+@keyframes fadeOut {
+    to {
+        opacity: 1;
+    }
+}
+
 .profile {
     background: #ffffff;
     border-radius: 10px;
@@ -211,7 +217,44 @@ body {
     cursor: pointer;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 1024px) {
+    .profile {
+        padding: 18px;
+    }
+
+    .back-button {
+        top: 18px;
+        left: 18px;
+    }
+
+    .profile h1 {
+        font-size: 22px;
+    }
+
+    .profile-picture-container {
+        width: 95px;
+        height: 95px;
+    }
+
+    .upload-button, #camera-button {
+        width: 28px;
+        height: 28px;
+    }
+
+    .block h2 {
+        font-size: 18px;
+    }
+
+    .block p {
+        font-size: 15px;
+    }
+
+    .verify-button, .save-button {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 768px) {
     .profile {
         padding: 15px;
     }
@@ -220,10 +263,35 @@ body {
         top: 15px;
         left: 15px;
     }
+
+    .profile h1 {
+        font-size: 20px;
+    }
+
+    .profile-picture-container {
+        width: 90px;
+        height: 90px;
+    }
+
+    .upload-button, #camera-button {
+        width: 26px;
+        height: 26px;
+    }
+
+    .block h2 {
+        font-size: 16px;
+    }
+
+    .block p {
+        font-size: 14px;
+    }
+
+    .verify-button, .save-button {
+        font-size: 12px;
+    }
 }
 
-/* Extra small screens (less than 480px) */
-@media (max-width: 320px) {
+@media (max-width: 480px) {
     .profile {
         padding: 10px;
     }
@@ -234,7 +302,7 @@ body {
     }
 
     .profile h1 {
-        font-size: 20px;
+        font-size: 18px;
     }
 
     .profile-picture-container {
@@ -243,19 +311,56 @@ body {
     }
 
     .upload-button, #camera-button {
-        width: 25px;
-        height: 25px;
+        width: 24px;
+        height: 24px;
     }
 
     .block h2 {
-        font-size: 18px;
-    }
-
-    .block p {
         font-size: 14px;
     }
 
-    .verify-button, .save-button {
+    .block p {
         font-size: 12px;
+    }
+
+    .verify-button, .save-button {
+        font-size: 10px;
+    }
+}
+
+@media (max-width: 320px) {
+    .profile {
+        padding: 5px;
+    }
+
+    .back-button {
+        top: 5px;
+        left: 5px;
+    }
+
+    .profile h1 {
+        font-size: 16px;
+    }
+
+    .profile-picture-container {
+        width: 70px;
+        height: 70px;
+    }
+
+    .upload-button, #camera-button {
+        width: 20px;
+        height: 20px;
+    }
+
+    .block h2 {
+        font-size: 12px;
+    }
+
+    .block p {
+        font-size: 10px;
+    }
+
+    .verify-button, .save-button {
+        font-size: 8px;
     }
 }

@@ -9,10 +9,10 @@ body {
 }
 
 form {
-    width: 80%; 
+    width: 90%; 
     max-width: 400px;
     padding: 20px;
-    background-color: rgba(55, 165, 215, 0.096);
+    background-color: rgba(22, 117, 161, 0.459);
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     text-align: center;
@@ -31,9 +31,22 @@ input[type="submit"] {
     margin-top: 5px;
     margin-bottom: 10px;
     border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.49);
     border: 1px solid #104f64;
     box-sizing: border-box;
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    to {
+        opacity: 1;
+    }
 }
 
 input[type="submit"] {
@@ -47,6 +60,57 @@ input[type="submit"] {
 input[type="submit"]:hover {
     background-color: #33863791;
     transform: translateY(-2px);
+}
+
+.modal {
+    display: none; 
+    position: fixed; 
+    z-index: 1; 
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    overflow: auto; 
+    background-color: rgba(0,0,0,0.4); 
+    transition: opacity 0.3s ease-in-out;
+    opacity: 0;
+}
+
+.modal.show {
+    display: block;
+    opacity: 1;
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: auto; 
+    padding: 30px;
+    border: 1px solid #888;
+    width: 60%; 
+    max-width: 600px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    border-radius: 8px;
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.close-button {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+    outline: none;
 }
 
 .sign-up {
@@ -101,18 +165,45 @@ input[type="submit"]:hover {
     color: green;
 }
 
-/* Large screens (Desktop, more than 992px) */
-@media only screen and (min-width: 992px) {
+.popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    border: 1px solid #ccc;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    width: 300px;
+    padding: 20px;
+    text-align: center;
+}
+
+.popup-content {
+    position: relative;
+}
+
+.popup .close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    font-size: 20px;
+}
+
+/* Large screens (Desktop, more than 1200px) */
+@media only screen and (min-width: 1200px) {
     form {
         width: 400px;
-        padding: 25px;
+        padding: 30px;
     }
 }
 
-/* Medium screens (Tablet, between 768px and 992px) */
-@media only screen and (min-width: 768px) and (max-width: 991px) {
+/* Medium screens (Tablet, between 768px and 1200px) */
+@media only screen and (min-width: 768px) and (max-width: 1199px) {
     form {
-        width: 85%;
+        width: 80%;
+        padding: 20px;
     }
 
     .logo {
@@ -146,8 +237,8 @@ input[type="submit"]:hover {
     }
 }
 
-/* Extra small screens (less than 480px) */
-@media only screen and (max-width: 480px) {
+/* Extra small screens (less than 576px) */
+@media only screen and (max-width: 575px) {
     form {
         width: 95%;
         padding: 10px;
@@ -169,5 +260,31 @@ input[type="submit"]:hover {
 
     .logo {
         width: 25px;
+    }
+}
+
+/* Extra extra small screens (less than 360px) */
+@media only screen and (max-width: 359px) {
+    form {
+        width: 100%;
+        padding: 5px;
+    }
+
+    input[type="text"],
+    input[type="password"],
+    input[type="email"],
+    input[type="number"],
+    input[type="date"],
+    input[type="submit"] {
+        padding: 4px;
+    }
+
+    input[type="submit"] {
+        padding: 6px;
+        font-size: 12px;
+    }
+
+    .logo {
+        width: 20px;
     }
 }

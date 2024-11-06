@@ -38,19 +38,21 @@ function updateData() {
 
             const rand = document.getElementById("data");
             const postureStatusImage = document.getElementById('postureStatusImage');
-            const postureStatusIcon = document.getElementById('postureStatusIcon');
+            // const postureStatusIcon = document.getElementById('postureStatusIcon');
             rand.textContent = postData;
 
             if (postData === "Good Posture!") {
                 postureStatusImage.src = "pics/2.png";
-                postureStatusIcon.className = "good";
+                // postureStatusIcon.className = "good";
                 rand.innerText = postData;
                 rand.className = "good";
+                console.log("Applied good class");
             } else if (postData === "Bad Posture Detected!" && lastStatus !== "bad") {
                 postureStatusImage.src = "pics/1.png";
-                postureStatusIcon.className = "bad";
+                // postureStatusIcon.className = "bad";
                 rand.innerText = postData;
                 rand.className = "bad";
+                console.log("Applied bad class");
 
                 // Send push notification if posture status is bad
                 showNotification();

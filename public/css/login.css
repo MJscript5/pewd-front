@@ -155,13 +155,14 @@ h1 {
     text-decoration: underline;
 }
 
-@media (max-width: 480px) {
+/* Small screens (max-width: 768px) */
+@media (max-width: 768px) {
     .login-form {
         padding: 30px;
     }
 
     .login-form h2 {
-        font-size: 20px;
+        font-size: 22px;
     }
 
     .input-box input {
@@ -177,14 +178,14 @@ h1 {
     }
 }
 
-/* Extra small screens (less than 480px) */
-@media (max-width: 320px) {
+/* Extra small screens (max-width: 480px) */
+@media (max-width: 480px) {
     .login-form {
         padding: 20px;
     }
 
     .login-form h2 {
-        font-size: 18px;
+        font-size: 20px;
     }
 
     .input-box input {
@@ -197,5 +198,28 @@ h1 {
 
     .btn {
         font-size: 12px;
+    }
+}
+
+/* Very small screens (max-width: 320px) */
+@media (max-width: 320px) {
+    .login-form {
+        padding: 15px;
+    }
+
+    .login-form h2 {
+        font-size: 18px;
+    }
+
+    .input-box input {
+        font-size: 10px;
+    }
+
+    .remember-forgot, .create-account {
+        font-size: 8px;
+    }
+
+    .btn {
+        font-size: 10px;
     }
 }

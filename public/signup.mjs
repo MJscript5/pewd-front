@@ -1,6 +1,7 @@
 import { auth, db } from './app.mjs';
-import { createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import { createUserWithEmailAndPassword, sendEmailVerification } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import { ref, set, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { redirectToLogin } from './auth.mjs';
 
 let isSubmitting = false;  // To prevent multiple submissions
 
@@ -63,52 +64,18 @@ async function createUserInDatabase(userId, userData) {
 }
 
 // Handle form submission
-document.getElementById('signup-form').addEventListener('submit', async function(event) {
-  event.preventDefault();
-  
-  if (isSubmitting) return;  // Prevent multiple submissions
-  isSubmitting = true;  // Set the flag to indicate submission is happening
+document.getElementById('signup-form').addEventListener('submit', async (event) => {
+  event.preventDefault(); // Prevent default form submission
 
+  // Clear previous messages
   clearMessages();
 
-  if (!checkFormCompletion()) {
-    displayError('Please fill out all required fields.');
-    isSubmitting = false;  // Allow resubmission
-    return;
-  }
-
-  const username = document.querySelector('input[name="username"]').value.trim();
-  const email = document.querySelector('input[name="email"]').value.trim();
-  const phoneNumber = document.querySelector('input[name="number"]').value.trim();
-  const password = document.querySelector('input[name="password"]').value;
-  const confirmPassword = document.querySelector('input[name="confirm_password"]').value;
-  const birthday = document.querySelector('input[name="birthday"]').value;
-
-  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailPattern.test(email)) {
-    displayError('Please enter a valid email address.');
-    isSubmitting = false;  // Allow resubmission
-    return;
-  }
-
-  const phonePattern = /^09\d{9}$/;
-  if (!phonePattern.test(phoneNumber)) {
-    displayError('Phone number must be 11 digits and start with "09".');
-    isSubmitting = false;  // Allow resubmission
-    return;
-  }
-
-  if (password.length < 8) {
-    displayError('Password must be at least 8 characters long.');
-    isSubmitting = false;  // Allow resubmission
-    return;
-  }
-
-  if (password !== confirmPassword) {
-    displayError('Passwords do not match.');
-    isSubmitting = false;  // Allow resubmission
-    return;
-  }
+  // Get form values
+  const username = event.target.username.value;
+  const email = event.target.email.value;
+  const phoneNumber = event.target.number.value;
+  const password = event.target.password.value;
+  const birthday = event.target.birthday.value;
 
   try {
     const existingField = await checkExistingUser(username, email, phoneNumber);
@@ -121,6 +88,9 @@ document.getElementById('signup-form').addEventListener('submit', async function
     // Create user in Firebase Authentication
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
+
+    // Send email verification
+    await sendEmailVerification(user);
 
     // Generate user ID using timestamp
     const userId = new Date().getTime();
@@ -135,16 +105,37 @@ document.getElementById('signup-form').addEventListener('submit', async function
 
     await createUserInDatabase(userId, userData);
 
+    // Show email verification modal
+    const modal = document.getElementById('email-verification-modal');
+    const closeButton = modal.querySelector('.close-button');
+    modal.style.display = 'block';
+
+    // Add event listener to close the modal
+    closeButton.addEventListener('click', () => {
+      modal.style.display = 'none';
+      window.location.href = 'index.html'; // Redirect to sign-in page
+    });
+
+    // Close the modal if the user clicks outside of it
+    window.addEventListener('click', (event) => {
+      if (event.target == modal) {
+        modal.style.display = 'none';
+        window.location.href = 'index.html'; // Redirect to sign-in page
+      }
+    });
+
     const successMessage = document.getElementById('success-message');
     successMessage.textContent = 'Sign-up successful! Redirecting to sign-in page...';
     successMessage.style.display = 'block';
     successMessage.setAttribute('role', 'alert');
+
     setTimeout(() => {
-      window.location.href = 'index.html';
-    }, 500);
+      window.location.href = 'index.html'; // Redirect to sign-in page
+    }, 300);
+
   } catch (error) {
-    displayError(error.message);
-    isSubmitting = false;  // Allow resubmission in case of error
+    displayError('An error occurred during sign-up. Please try again.');
+    isSubmitting = false;  // Allow resubmission
   }
 });
 
@@ -152,7 +143,7 @@ document.getElementById('signup-form').addEventListener('submit', async function
 document.getElementById('signup-form').addEventListener('keydown', function(event) {
   if (event.key === 'Enter') {
     event.preventDefault();
-    this.dispatchEvent(new Event('submit'));
+    this.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
   }
 });
 

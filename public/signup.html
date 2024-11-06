@@ -39,7 +39,7 @@
             </div>
             
             <label for="birthday" class="left-align">Birthday</label>
-            <input type="date" name="birthday" placeholder="Birthday" required min="1915-01-01" max="2024-05-31">
+            <input type="date" name="birthday" id="birthday" placeholder="Birthday" required min="1915-01-01" max="2024-05-31">
 
             <p id="notification-message" class="error" style="display: none;"></p>
             <p id="error-message" class="error" style="display: none;"></p>
@@ -50,6 +50,13 @@
                 <p>Already have an account? <a href="index.html">Sign in</a></p>
             </div>
         </form>
+
+        <div id="email-verification-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-button">&times;</span>
+                <p>Please verify your email address. Check your inbox for a verification email.</p>
+            </div>
+        </div>
 
         <script type="module" src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
         <script type="module" src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"></script>
