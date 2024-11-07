@@ -71,9 +71,12 @@ async function checkLogin(username, password, rememberMe) {
 
 document.addEventListener('DOMContentLoaded', async () => {
     try {
-        await checkAuth(); // User is already logged in, redirect to dashboard
-        redirectToDashboard();
-    } catch (error) { // User is not logged in, show login form
+        // const loginPage = window.location.pathname.includes('index.html');
+        if (!loginPage) { // Only redirect if not on login page
+            await checkAuth(); // User is already logged in, redirect to dashboard
+            redirectToDashboard();
+        }
+    } catch (error) {
         console.log("User not logged in, showing login form");
         
         if (localStorage.getItem('rememberMe') === 'true') {

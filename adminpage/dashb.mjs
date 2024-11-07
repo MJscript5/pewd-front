@@ -2,9 +2,9 @@
 
 // Simulated records data - in a real app, this would come from an API
 const mockPostureRecords = [
-  { id: 1, userId: 1, date: '2024-01-15', postureName: 'Standing', accuracy: 95 },
-  { id: 2, userId: 1, date: '2024-01-16', postureName: 'Sitting', accuracy: 88 },
-  { id: 3, userId: 2, date: '2024-01-15', postureName: 'Walking', accuracy: 92 },
+  { id: 1, userId: 1, date: '2024-11-06', postureName: 'Good Posture'},
+  { id: 2, userId: 1, date: '2024-11-05', postureName: 'Bad Posture' },
+  { id: 3, userId: 2, date: '2024-11-06', postureName: 'Good Posture' },
 ];
 
 export function logout() {
@@ -29,7 +29,6 @@ export function viewRecords(userId) {
           <div style="border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; border-radius: 4px;">
               <h3>${record.postureName}</h3>
               <p>Date: ${record.date}</p>
-              <p>Accuracy: ${record.accuracy}%</p>
           </div>
       `).join('');
   } else {

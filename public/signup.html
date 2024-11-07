@@ -26,7 +26,7 @@
             </div>
             <input type="text" name="username" placeholder="Username" required>
             <input type="email" name="email" placeholder="Email" required>
-            <input type="text" name="number" placeholder="Phone Number" required pattern="09\d{9}" title="Phone number must be 11 digits and start with '09'">
+            <input type="text" name="number" placeholder="Phone Number" pattern="09\d{9}" title="Phone number must be 11 digits and start with '09'" required>
             
             <div class="password-container" style="position: relative;">
                 <input type="password" name="password" id="password" placeholder="Password" required>
@@ -39,7 +39,7 @@
             </div>
             
             <label for="birthday" class="left-align">Birthday</label>
-            <input type="date" name="birthday" id="birthday" placeholder="Birthday" required min="1915-01-01" max="2024-05-31">
+            <input type="date" name="birthday" id="birthday" placeholder="Birthday" min="1915-01-01" max="2024-05-31" required>
 
             <p id="notification-message" class="error" style="display: none;"></p>
             <p id="error-message" class="error" style="display: none;"></p>

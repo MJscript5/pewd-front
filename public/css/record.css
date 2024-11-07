@@ -16,7 +16,7 @@ body {
 
 @keyframes fadeOut {
     to {
-        opacity: 0;
+        opacity: 1;
     }
 }
 
@@ -123,90 +123,167 @@ body {
 }
 
 /* Responsive Styles */
-@media (max-width: 768px) {
+/* 1440x1080 */
+@media (max-width: 1440px) {
     #sortContainer {
-        flex-direction: column;
-        align-items: flex-start;
+        flex-direction: row;
+        align-items: center;
+        padding: 20px;
     }
 
-    .record {
-        flex-direction: column;
-        align-items: flex-start;
+    #sortContainer label {
+        font-size: 16px;
     }
 
-    .record .time-duration,
-    .record .date-time,
-    .record .posture {
-        font-size: 12px;
-        text-align: left;
+    #sort {
+        padding: 4px;
+        font-size: 16px;
     }
 
-    .record .date-time {
-        text-align: right;
-        margin-left: 0;
-        position: static;
-        align-self: flex-end;
-    }
-
-    .record .posture {
-        text-align: center;
-        align-self: center;
-    }
-}
-
-@media (max-width: 480px) {
-    #sortContainer {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .record {
-        padding: 2px;
-        margin: 2px 0;
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .record .posture {
-        font-size: 12px;
-        text-align: center;
-        align-self: center;
-    }
-
-    .record .date-time {
-        font-size: 10px;
-        margin-bottom: 1px;
-        text-align: right;
-        align-self: flex-end;
-    }
-}
-
-/* Extra small screens (less than 480px) */
-@media (max-width: 320px) {
-    .record {
-        padding: 8px;
-        margin: 3px 0;
-    }
-
-    .record .posture {
-        font-size: 12px;
-    }
-
-    .record .date-time {
-        font-size: 8px;
-    }
-}
-
-@media (min-width: 769px) {
     .record {
         flex-direction: row;
         align-items: center;
     }
 
-    .record .date-time,
-    .record .posture,
     .record .time-duration {
-        width: auto;
+        font-size: 16px;
         text-align: left;
+    }
+
+    .record .posture {
+        font-size: 19px;
+        text-align: center;
+        align-self: center;
+    }
+
+    .record .date-time {
+        font-size: 16px;
+        text-align: right;
+        margin-left: 10px;
+        position: relative;
+        align-self: center;
+    }
+}
+
+/* 768x1024 */
+@media (max-width: 768px) {
+    #sortContainer {
+        flex-direction: row;
+        align-items: center;
+        padding: 15px;
+    }
+
+    #sortContainer label {
+        font-size: 14px;
+    }
+
+    #sort {
+        padding: 3px;
+        font-size: 14px;
+    }
+
+    .record {
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .record .time-duration {
+        font-size: 14px;
+        text-align: left;
+    }
+
+    .record .posture {
+        font-size: 17px;
+        text-align: center;
+        align-self: center;
+    }
+
+    .record .date-time {
+        font-size: 14px;
+        text-align: right;
+        margin-left: 10px;
+        position: relative;
+        align-self: center;
+    }
+}
+
+/* 480x800 */
+@media (max-width: 480px) {
+    #sortContainer {
+        align-items: flex-start;
+        padding: 5px;
+    }
+
+    #sortContainer label {
+        padding: 5px;
+        font-size: 15px;
+    }
+
+    #sort {
+        padding: 5px;
+        font-size: 12px;
+    }
+
+    .record {
+        padding: 2px;
+        margin: 5px 0;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .record .posture {
+        font-size: 15px;
+        text-align: center;
+        align-self: center;
+    }
+
+    .record .date-time {
+        font-size: 12px;
+        margin-bottom: 8px;
+        text-align: right;
+        align-self: flex-end;
+    }
+}
+
+/* For screens up to 360x640 pixels */
+@media (max-width: 360px) {
+    #sortContainer {
+        align-items: flex-start;
+        padding: 5px;
+    }
+
+    #sortContainer label {
+        font-size: 10px;
+    }
+
+    #sort {
+        padding: 1px;
+        font-size: 10px;
+    }
+
+    .record {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 0; 
+        margin: 1px 0;
+    }
+
+    .record .time-duration {
+        font-size: 9px; 
+        text-align: left;
+    }
+
+    .record .posture {
+        font-size: 12px;
+        text-align: center;
+        align-self: center;
+    }
+
+    .record .date-time {
+        font-size: 9px;
+        text-align: right;
+        margin-left: 0;
+        position: static;
+        align-self: flex-end;
     }
 }

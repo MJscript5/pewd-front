@@ -67,30 +67,59 @@ async function createUserInDatabase(userId, userData) {
 document.getElementById('signup-form').addEventListener('submit', async (event) => {
   event.preventDefault(); // Prevent default form submission
 
-  // Clear previous messages
-  clearMessages();
+  // Check if all required fields are filled
+  if (!checkFormCompletion()) {
+    displayError('Please fill in all required fields.');
+    return;
+  }
+
+  // Check if a submission is already in progress
+  if (isSubmitting) {
+    return;
+  }
+
+  isSubmitting = true; // Set the flag to prevent further submissions
+  clearMessages(); // Clear previous messages
 
   // Get form values
   const username = event.target.username.value;
   const email = event.target.email.value;
   const phoneNumber = event.target.number.value;
   const password = event.target.password.value;
+  const confirmPassword = event.target.confirm_password.value;
   const birthday = event.target.birthday.value;
 
   try {
+    // Disable submit button to prevent duplicate clicks
+    event.target.querySelector('input[type="submit"]').disabled = true;
+
+    // Check if the user already exists
     const existingField = await checkExistingUser(username, email, phoneNumber);
     if (existingField) {
-      displayError(`${existingField} already exists. Please choose a different one or log in.`);
+      displayError(`User with this ${existingField} already exists.`);
+      isSubmitting = false; // Allow resubmission
+      event.target.querySelector('input[type="submit"]').disabled = false; // Re-enable submit button
+      return;
+    }
+
+    // Validate passwords
+    if (password !== confirmPassword) {
+      displayError('Passwords do not match. Please try again.');
       isSubmitting = false;  // Allow resubmission
+      event.target.querySelector('input[type="submit"]').disabled = false; // Re-enable submit button
+      return;
+    }
+
+    if (!isValidPassword(password)) {
+      displayError('Password is invalid. Please ensure it meets the required criteria.');
+      isSubmitting = false;  // Allow resubmission
+      event.target.querySelector('input[type="submit"]').disabled = false; // Re-enable submit button
       return;
     }
 
     // Create user in Firebase Authentication
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
-
-    // Send email verification
-    await sendEmailVerification(user);
 
     // Generate user ID using timestamp
     const userId = new Date().getTime();
@@ -105,39 +134,65 @@ document.getElementById('signup-form').addEventListener('submit', async (event) 
 
     await createUserInDatabase(userId, userData);
 
-    // Show email verification modal
-    const modal = document.getElementById('email-verification-modal');
-    const closeButton = modal.querySelector('.close-button');
-    modal.style.display = 'block';
+    // Send email verification
+    await sendEmailVerification(user);
 
-    // Add event listener to close the modal
-    closeButton.addEventListener('click', () => {
-      modal.style.display = 'none';
-      redirectToLogin(); // Redirect to sign-in page
-    });
-
-    // Close the modal if the user clicks outside of it
-    window.addEventListener('click', (event) => {
-      if (event.target == modal) {
-        modal.style.display = 'none';
-        redirectToLogin(); // Redirect to sign-in page
-      }
-    });
-
+    // Show success message
     const successMessage = document.getElementById('success-message');
-    successMessage.textContent = 'Sign-up successful! Redirecting to sign-in page...';
+    successMessage.textContent = 'Sign-up successful! Redirecting...';
     successMessage.style.display = 'block';
     successMessage.setAttribute('role', 'alert');
 
+    // Redirect to email provider and login page
     setTimeout(() => {
-      redirectToLogin(); // Redirect to sign-in page
-    }, 300);
+      openEmailProvider(email);
+      setTimeout(() => {
+        redirectToLogin();
+      }, 3000); // Redirect delay
+    }, 1000);
+
+    // Clear credentials from local storage
+    localStorage.clear();
 
   } catch (error) {
-    displayError('An error occurred during sign-up. Please try again.');
+    console.error('Sign-up error:', error.message); // Logs a concise error message
+    if (error.code === 'auth/email-already-in-use') {
+      displayError('User with this email already exists.');
+    } else if (error.code === 'auth/invalid-email') {
+      displayError('Invalid email address.');
+    } else if (error.code === 'auth/weak-password') {
+      displayError('Password is too weak.');
+    } else {
+      displayError('An error occurred during sign-up. Please try again.');
+    }
     isSubmitting = false;  // Allow resubmission
+    event.target.querySelector('input[type="submit"]').disabled = false; // Re-enable submit button
   }
 });
+
+// Function to open email provider
+function openEmailProvider(email) {
+  const emailDomain = email.split('@')[1];
+  let emailProviderUrl;
+
+  switch (emailDomain) {
+    case 'gmail.com':
+      emailProviderUrl = 'https://mail.google.com/';
+      break;
+    case 'yahoo.com':
+      emailProviderUrl = 'https://mail.yahoo.com/';
+      break;
+    case 'outlook.com':
+      emailProviderUrl = 'https://outlook.live.com/';
+      break;
+    default:
+      emailProviderUrl = `https://mail.${emailDomain}/`;
+  }
+
+  if (emailProviderUrl) {
+    window.open(emailProviderUrl, '_blank');
+  }
+}
 
 // Enter key handling for form submission
 document.getElementById('signup-form').addEventListener('keydown', function(event) {
@@ -171,4 +226,9 @@ function togglePasswordVisibilityHelper(inputElement, toggleIcon) {
     toggleIcon.classList.remove('bx-show');
     toggleIcon.classList.add('bx-hide');
   }
+}
+
+// Helper function to validate password
+function isValidPassword(password) {
+  return password.length >= 8; 
 }
