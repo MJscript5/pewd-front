@@ -1,0 +1,137 @@
+body {
+    font-family: Arial, sans-serif;
+    background-size: cover;
+    display: flex;
+    justify-content: center;
+    background-color: #285483; 
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.sign-up {
+    display: flex;
+    justify-content: center;
+    position: relative; 
+}
+
+.logo {
+    position: absolute; 
+    top: 0;
+    right: 0; 
+    width: 50px; 
+    height: auto;
+}
+.container {
+    background-color: #3370b2;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    width: 300px;
+    text-align: center;
+}
+
+h2 {
+    margin-bottom: 15px;
+    font-size: 22px;
+}
+
+.form-group {
+    margin-bottom: 12px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 14px;
+}
+
+.form-group input,
+.form-group select {
+    width: 95%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.form-button {
+    width: 100%;
+    padding: 10px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.form-button:hover {
+    background-color: #218838;
+}
+
+.error-message, .success-message {
+    display: none;
+    margin-top: 10px;
+}
+
+.error-message {
+    color: red;
+}
+
+.success-message {
+    color: green;
+}
+
+/* Large screens (Desktop, more than 1200px) */
+@media only screen and (min-width: 1200px) {
+    .container {
+        width: 400px;
+        padding: 30px;
+    }
+}
+
+/* Small screens (Mobile, less than 768px) */
+@media only screen and (max-width: 767px) {
+    .container {
+        width: 80%;
+        padding: 15px;
+    }
+
+    .form-group input,
+    .form-group select {
+        padding: 8px;
+    }
+
+    .form-button {
+        padding: 10px;
+        font-size: 16px;
+    }
+
+    .logo {
+        width: 50px;
+    }
+}
+
+/* Extra small screens (less than 360px) */
+@media only screen and (max-width: 359px) {
+    .container {
+        width: 80%;
+        padding: 5px;
+    }
+
+    .form-group input,
+    .form-group select {
+        padding: 4px;
+    }
+
+    .form-button {
+        padding: 6px;
+        font-size: 12px;
+    }
+
+    .logo {
+        width: 45px;
+    }
+}

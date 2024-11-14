@@ -111,7 +111,7 @@ body {
     padding: 10px;
     margin-bottom: 10px;
     color: #333;
-    text-align: left;
+    text-align: center;
 }
 
 .block h2 {
@@ -121,12 +121,37 @@ body {
     font-weight: bold;
 }
 
+.block input {
+    width: 100%;
+    padding: 5px;
+    margin-top: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px; 
+    box-sizing: border-box;
+}
+
+.block.editable {
+    background: #f9f9f9;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+    color: #333;
+    text-align: left; 
+}
+
 .block p {
     margin: 0;
     font-size: 16px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+#full-name {
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    display: block;
 }
 
 .copy-button {
@@ -217,6 +242,15 @@ body {
     padding: 10px 20px;
     border-radius: 5px;
     cursor: pointer;
+}
+
+.editable {
+    background: #f9f9f9;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+    color: #333;
+    text-align: center;
 }
 
 @media (max-width: 1024px) {
@@ -364,5 +398,5 @@ body {
 
     .verify-button, .save-button {
         font-size: 8px;
-    }
+    }   
 }

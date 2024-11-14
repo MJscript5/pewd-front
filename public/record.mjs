@@ -1,24 +1,21 @@
-import { db } from './app.mjs';
+import { db, auth } from './app.mjs';
 import { ref, onValue } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
-import { checkAuth, redirectToLogin } from './auth.mjs';
-
+import { checkAuth } from './auth.mjs';
 
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         await checkAuth();
-        // User is authenticated, proceed with page functionality
         fetchDataChanges();
     } catch (error) {
-        console.error("User not logged in:", error);
-        redirectToLogin();
+        console.error('User is not authenticated:', error);
+        handleUnauthenticatedUser();
     }
 });
 
-// Function to format time duration
 function timeAgo(dateString) {
     const now = new Date();
     const recordDate = new Date(dateString);
-    const diff = Math.floor((now - recordDate) / 1000); // difference in seconds
+    const diff = Math.floor((now - recordDate) / 1000);
 
     if (diff < 60) {
         return `${diff} sec${diff === 1 ? '' : 's'} ago`;
@@ -35,77 +32,91 @@ function timeAgo(dateString) {
 }
 
 function fetchRecords(sortOrder = 'time_desc') {
-    const recordsRef = ref(db, 'Sensor/Record');
+    const user = auth.currentUser;
 
-    onValue(recordsRef, (snapshot) => {
-        const recordsContainer = document.getElementById('recordsContainer');
-        recordsContainer.innerHTML = ''; // Clear existing records
+    if (user) {
+        const recordsRef = ref(db, `users/${user.uid}/records`);
 
-        if (snapshot.exists()) {
-            const records = [];
+        onValue(recordsRef, (snapshot) => {
+            const recordsContainer = document.getElementById('recordsContainer');
+            recordsContainer.innerHTML = '';
 
-            snapshot.forEach((childSnapshot) => {
-                const record = childSnapshot.val();
-                records.push(record);
-            });
+            if (snapshot.exists()) {
+                const records = [];
 
-            // Sort records based on the selected option
-            records.sort((a, b) => {
-                const dateA = new Date(`${a.Date} ${a.PhilippineTime}`);
-                const dateB = new Date(`${b.Date} ${b.PhilippineTime}`);
+                snapshot.forEach((childSnapshot) => {
+                    const record = childSnapshot.val();
+                    records.push(record);
+                });
 
-                if (sortOrder === 'time_asc') {
-                    return dateA - dateB;
-                } else if (sortOrder === 'time_desc') {
-                    return dateB - dateA;
-                }
-            });
+                records.sort((a, b) => {
+                    const dateA = new Date(`${a.Date} ${a.PhilippineTime}`);
+                    const dateB = new Date(`${b.Date} ${b.PhilippineTime}`);
 
-            // Insert sorted records into the container
-            records.forEach(record => {
-                const recordDiv = document.createElement('div');
-                recordDiv.className = 'record';
+                    if (sortOrder === 'time_asc') {
+                        return dateA - dateB;
+                    } else if (sortOrder === 'time_desc') {
+                        return dateB - dateA;
+                    } else {
+                        return 0; // Default case to handle unexpected sortOrder values
+                    }
+                });
 
-                const timeDurationDiv = document.createElement('div');
-                timeDurationDiv.className = 'time-duration';
-                const recordDateTime = `${record.Date || 'N/A'} ${record.PhilippineTime || 'N/A'}`;
-                timeDurationDiv.textContent = timeAgo(recordDateTime);
-                recordDiv.appendChild(timeDurationDiv);
+                records.forEach(record => {
+                    const recordDiv = document.createElement('div');
+                    recordDiv.className = 'record';
 
-                const postureDiv = document.createElement('div');
-                postureDiv.className = 'posture';
-                postureDiv.textContent = record.Posture || 'N/A';
-                recordDiv.appendChild(postureDiv);
+                    const timeDurationDiv = document.createElement('div');
+                    timeDurationDiv.className = 'time-duration';
+                    const recordDateTime = `${record.Date || 'N/A'} ${record.PhilippineTime || 'N/A'}`;
+                    timeDurationDiv.textContent = timeAgo(recordDateTime);
+                    recordDiv.appendChild(timeDurationDiv);
 
-                recordsContainer.appendChild(recordDiv);
+                    const postureDiv = document.createElement('div');
+                    postureDiv.className = 'posture';
+                    postureDiv.textContent = record.Posture || 'N/A';
+                    recordDiv.appendChild(postureDiv);
 
-                const dateTimeDiv = document.createElement('div');
-                dateTimeDiv.className = 'date-time';
-                dateTimeDiv.textContent = recordDateTime;
-                recordDiv.appendChild(dateTimeDiv);
-            });
-        } else {
-            // Handle the case where there are no records
-            const noRecordsDiv = document.createElement('div');
-            noRecordsDiv.className = 'record';
-            noRecordsDiv.textContent = 'No records found';
-            recordsContainer.appendChild(noRecordsDiv);
-        }
-    }, (error) => {
-        console.error('Error fetching records:', error);
-    });
+                    const dateTimeDiv = document.createElement('div');
+                    dateTimeDiv.className = 'date-time';
+                    dateTimeDiv.textContent = recordDateTime;
+                    recordDiv.appendChild(dateTimeDiv);
+
+                    recordsContainer.appendChild(recordDiv);
+                });
+            } else {
+                displayMessage('No records found', 'record');
+            }
+        }, (error) => {
+            console.error('Error fetching records:', error);
+            displayMessage('Error fetching records. Please try again later.', 'error');
+        });
+    } else {
+        handleUnauthenticatedUser();
+    }
 }
 
-// Function to handle sorting based on user selection
+function handleUnauthenticatedUser() {
+    displayMessage('Please log in to view your records.', 'info');
+    document.getElementById('sort').disabled = true;
+}
+
+function displayMessage(message, className) {
+    const recordsContainer = document.getElementById('recordsContainer');
+    recordsContainer.innerHTML = '';
+    const messageDiv = document.createElement('div');
+    messageDiv.className = className;
+    messageDiv.textContent = message;
+    recordsContainer.appendChild(messageDiv);
+}
+
 function fetchDataChanges() {
     const sortOption = document.getElementById('sort').value;
     fetchRecords(sortOption); 
 }
 
-// Attach the function to the window object to make it accessible in HTML
 window.fetchDataChanges = fetchDataChanges;
 
-// Call fetchDataChanges on page load to display records with default sorting
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('sort').value = 'time_desc'; 
     fetchDataChanges();

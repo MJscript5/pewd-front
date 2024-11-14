@@ -32,7 +32,7 @@ function clearMessages() {
 }
 
 // Check if the user already exists
-async function checkExistingUser(username, email, phoneNumber) {
+async function checkExistingUser(username, fullName, email, phoneNumber) {
   const usersRef = ref(db, 'users');
   try {
     const snapshot = await get(usersRef);
@@ -42,6 +42,7 @@ async function checkExistingUser(username, email, phoneNumber) {
         const user = users[userId];
         if (user.username === username) return 'Username';
         if (user.email === email) return 'Email';
+        if(user.fullName === fullName) return 'Full Name';
         if (user.phoneNumber === phoneNumber) return 'Phone number';
       }
     }
@@ -55,7 +56,10 @@ async function checkExistingUser(username, email, phoneNumber) {
 // Create a new user in the database
 async function createUserInDatabase(userId, userData) {
   try {
-    await set(ref(db, 'users/' + userId), userData);
+    await set(ref(db, 'users/' + userId), {
+      ...userData,
+      records: {}  // Add records inside the user's node
+    });
     return true;
   } catch (error) {
     console.error('Error creating new user:', error);
@@ -82,6 +86,7 @@ document.getElementById('signup-form').addEventListener('submit', async (event) 
   clearMessages(); // Clear previous messages
 
   // Get form values
+  const fullName = event.target.fullName.value;
   const username = event.target.username.value;
   const email = event.target.email.value;
   const phoneNumber = event.target.number.value;
@@ -94,7 +99,7 @@ document.getElementById('signup-form').addEventListener('submit', async (event) 
     event.target.querySelector('input[type="submit"]').disabled = true;
 
     // Check if the user already exists
-    const existingField = await checkExistingUser(username, email, phoneNumber);
+    const existingField = await checkExistingUser(username, fullName, email, phoneNumber);
     if (existingField) {
       displayError(`User with this ${existingField} already exists.`);
       isSubmitting = false; // Allow resubmission
@@ -126,10 +131,12 @@ document.getElementById('signup-form').addEventListener('submit', async (event) 
 
     // Store additional user data in Firebase Realtime Database
     const userData = {
+      fullName,
       username,
       email,
       phoneNumber,
-      birthday
+      birthday,
+      records: {}  // Initialize records as an empty object
     };
 
     await createUserInDatabase(userId, userData);

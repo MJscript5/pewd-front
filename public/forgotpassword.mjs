@@ -18,7 +18,7 @@ async function handlePasswordChange(oobCode, newPassword) {
     try {
         await confirmPasswordReset(auth, oobCode, newPassword);
         console.log("Password changed successfully!");
-        redirectToLogin();
+        redirectToPreviousPage();
     } catch (error) {
         console.error("Error changing password:", error);
         // Handle error (e.g., show error message to user)
@@ -69,7 +69,7 @@ async function handleFormSubmit(e) {
                 redirectLink.textContent = 'Login';
                 redirectLink.onclick = (event) => {
                     event.preventDefault();
-                    redirectToLogin();
+                    redirectToPreviousPage();
                 };
 
                 messageElement.appendChild(document.createElement('br'));
@@ -81,6 +81,15 @@ async function handleFormSubmit(e) {
     } catch (error) {
         console.error('Error handling form submission:', error);
         messageElement.textContent = 'An error occurred. Please try again.';
+    }
+}
+
+function redirectToPreviousPage() {
+    const previousPage = document.referrer;
+    if (previousPage.includes('index.html')) {
+        window.location.href = 'index.html';
+    } else {
+        window.location.href = 'admin_login.html';
     }
 }
 
@@ -97,4 +106,4 @@ function initForm() {
 // Initialize the form when the DOM is loaded
 document.addEventListener('DOMContentLoaded', initForm);
 
-export { sendResetEmail };
+export { sendResetEmail, redirectToPreviousPage };

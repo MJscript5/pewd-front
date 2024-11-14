@@ -1,4 +1,4 @@
-import { db, auth, setLastPosture, lastPosture } from './app.mjs';
+import { db, auth, setLastPosture, fetchLastPosture } from './app.mjs';
 import { ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import { checkAuth, redirectToLogin } from './auth.mjs';
 
@@ -46,15 +46,15 @@ function updateData() {
                 postureStatusImage.src = "pics/2.png";
                 rand.innerText = postData;
                 rand.className = "good";
-                console.log("Applied good class");
-            } else if (postData === "Bad Posture Detected!" && lastPosture !== "Bad Posture Detected!") {
+                // console.log("Applied good class");
+            } else if (postData === "Bad Posture Detected!" && fetchLastPosture !== "Bad Posture Detected!") {
                 postureStatusImage.src = "pics/1.png";
                 rand.innerText = postData;
                 rand.className = "bad";
-                console.log("Applied bad class");
+                // console.log("Applied bad class");
 
                 // Send push notification if posture status is bad and different from last status
-                if (lastPosture !== postData) {
+                if (fetchLastPosture !== postData) {
                     showNotification();
                 }
             }

@@ -166,16 +166,24 @@ async function fetchUserData(username) {
 }
 
 function populateUserProfile(userData, userId) {
-  document.getElementById('user-id').textContent = userId;
-  document.getElementById('username').textContent = userData.username;
-  document.getElementById('user-email').textContent = userData.email;
-  document.getElementById('phone-number').value = userData.phoneNumber || '';
-  document.getElementById('birthday').value = userData.birthday || '';
-  
+  const userIdElement = document.getElementById('user-id');
+  const usernameElement = document.getElementById('username');
+  const userEmailElement = document.getElementById('user-email');
+  const phoneNumberElement = document.getElementById('phone-number');
+  const birthdayElement = document.getElementById('birthday');
+  const fullNameElement = document.getElementById('full-name');
+
+  if (userIdElement) userIdElement.textContent = userId;
+  if (usernameElement) usernameElement.textContent = userData.username;
+  if (userEmailElement) userEmailElement.textContent = userData.email;
+  if (phoneNumberElement) phoneNumberElement.value = userData.phoneNumber || '';
+  if (birthdayElement) birthdayElement.value = userData.birthday || '';
+  if (fullNameElement) fullNameElement.textContent = userData.fullName || '';
+
   // Check email and phone verification statuses
   const user = auth.currentUser;  // Firebase auth current user
   checkEmailVerificationStatus(user);  // Check email verification status
-//   checkPhoneVerificationStatus(userData.phoneVerified);  // Check phone verification status
+  // checkPhoneVerificationStatus(userData.phoneVerified);  // Check phone verification status
 }
 
 // Toggle edit/save mode
@@ -296,13 +304,16 @@ function setupEventListeners() {
 }
 
 // Copy User ID
-function copyUserId() {
-    navigator.clipboard.writeText(document.getElementById('user-id').textContent).then(() => {
-        alert('User ID copied to clipboard!');
-    }).catch(err => {
-        console.error('Failed to copy: ', err);
-    });
-}
+document.getElementById('copy-user-id').addEventListener('click', function() {
+    var userId = document.getElementById('user-id').textContent;
+    var tempInput = document.createElement('input');
+    tempInput.value = userId;
+    document.body.appendChild(tempInput);
+    tempInput.select();
+    document.execCommand('copy');
+    document.body.removeChild(tempInput);
+    // alert('User ID copied to clipboard');
+});
 
 // Show the verify email button if the email is not verified
 function checkEmailVerificationStatus(user) {

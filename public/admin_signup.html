@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/admin_signup.css">     
+    <link rel="icon" type="image/x-icon" href="pics/logo.png">
+    <title>Sign Up</title>
+</head>
+<body>
+    <div class="container" id="signup-container">
+        <div class="sign-up">
+            <img src="pics/logo.png" alt="Logo" class="logo">
+            <h2>Sign Up</h2>
+        </div>
+        <form id="signup-form">
+            <div class="form-group">
+                <label for="signup-fullName">Full Name</label>
+                <input type="text" id="signup-fullName" required>
+            </div>
+            <div class="form-group">
+                <label for="signup-email">Email</label>
+                <input type="email" id="signup-email" required>
+            </div>
+            <div class="form-group">
+                <label for="signup-password">Password</label>
+                <input type="password" id="signup-password" required>
+            </div>
+            <div class="form-group">
+                <label for="signup-confirmPassword">Confirm Password</label>
+                <input type="password" id="signup-confirmPassword" required>
+            </div>
+            <div class="form-group">
+                <label for="signup-jobTitle">Specialization</label>
+                <select id="signup-jobTitle" required>
+                    <option value="" disabled selected>Select your Specialization</option>
+                    <option value="Orthopedic Surgeon">Orthopedic Surgeon</option>
+                    <option value="Physical Therapist">Physical Therapist</option>
+                    <option value="Chiropractor">Chiropractor</option>
+                    <option value="Occupational Therapist">Occupational Therapist</option>
+                    <option value="Postural Specialist">Postural Specialist</option>
+                    <option value="Sports Medicine Specialist">Sports Medicine Specialist</option>
+                    <option value="Rehabilitation Specialist">Rehabilitation Specialist</option>
+                    <option value="Podiatrist">Podiatrist</option>
+                    <option value="Others">Others</option>
+                </select>
+                <input type="text" id="signup-otherJobTitle" placeholder="Please specify" style="display: none;">
+            </div>
+            <button type="submit" class="form-button">Sign Up</button>
+            <p class="error-message" id="signup-error-message"></p>
+            <p class="success-message" id="signup-success-message"></p>
+        </form>
+        <p>Already have an account? <a href="admin_login.html" id="switch-to-login">Log In</a></p>
+    </div>
+
+    <script>
+        // Show/hide other job title input
+        document.getElementById("signup-jobTitle").addEventListener("change", function () {
+            const otherJobTitleInput = document.getElementById("signup-otherJobTitle");
+            if (this.value === "Others") {
+                otherJobTitleInput.style.display = "block";
+                otherJobTitleInput.setAttribute("required", "required");
+            } else {
+                otherJobTitleInput.style.display = "none";
+                otherJobTitleInput.removeAttribute("required");
+                otherJobTitleInput.value = "";
+            }
+        });
+    </script>
+    <script src="admin_signup.mjs" type="module"></script>
+</body>
+</html>

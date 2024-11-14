@@ -3,7 +3,7 @@ import { ref, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-da
 import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { checkAuth, redirectToDashboard } from './auth.mjs';
 
-function displayMessage(message, isError = true) {
+export function displayMessage(message, isError = true) {
     const messageElement = document.querySelector('.login-message');
     messageElement.textContent = message;
     messageElement.style.display = message ? 'block' : 'none';

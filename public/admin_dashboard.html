@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/admin_dashboard.css">
+    <link rel=" icon" href="pics/logo2.png">
     <title>MMCM Posture Checker - Admin Dashboard</title>
 </head>
 <body>
@@ -18,17 +19,23 @@
 
         <h2>Admin Dashboard</h2>
 
+        <!-- User ID input for fetching specific user records -->
+        <div class="user-input">
+            <input type="text" id="userIdInput" placeholder="Enter User ID" />
+            <button class="btn" id="fetchRecordsBtn">Fetch Records</button>
+        </div>
+
         <div class="stats-box">
             <div class="stat">
-                <h3>2</h3>
+                <h3 id="totalUsers">0</h3>
                 <p>Total Users</p>
             </div>
             <div class="stat">
-                <h3>2</h3>
+                <h3 id="totalRecordsViews">0</h3>
                 <p>Total Records Views</p>
             </div>
             <div class="stat">
-                <h3>2</h3>
+                <h3 id="activeAdmins">0</h3>
                 <p>Active Admins</p>
             </div>
         </div>
@@ -43,27 +50,8 @@
                     <th>Records Views</th>
                 </tr>
             </thead>
-            <tbody>
-                <tr>
-                    <td>1</td>
-                    <td>John Mark Ibarra</td>
-                    <td>johnmark@example.com</td>
-                    <td>639123456789</td>
-                    <td>
-                        0
-                        <button class="btn view-records" data-user-id="1">View All Records</button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>2</td>
-                    <td>Sofia Smith</td>
-                    <td>sofiasmith@example.com</td>
-                    <td>0987654321</td>
-                    <td>
-                        0
-                        <button class="btn view-records" data-user-id="2">View All Records</button>
-                    </td>
-                </tr>
+            <tbody id="userTableBody">
+                <!-- Data will be fetched from the database -->
             </tbody>
         </table>
     </div>
@@ -77,16 +65,22 @@
     </div>
 
     <script type="module">
-        import { logout, viewRecords } from './dashb.mjs';
+        import { logout, viewRecords, fetchUserRecords, loadUserStats } from './admin_dashboard.mjs';
 
         document.getElementById('logoutBtn').addEventListener('click', logout);
 
-        document.querySelectorAll('.view-records').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const userId = e.target.getAttribute('data-user-id');
-                viewRecords(userId);
-            });
+        // Fetch records for a specific user based on User ID input
+        document.getElementById('fetchRecordsBtn').addEventListener('click', () => {
+            const userId = document.getElementById('userIdInput').value;
+            if (userId) {
+                fetchUserRecords(userId);
+            } else {
+                alert('Please enter a valid User ID.');
+            }
         });
+
+        // Load initial stats
+        loadUserStats();
 
         // Close modal when clicking on the close button or outside the modal
         document.querySelector('.close').addEventListener('click', () => {
