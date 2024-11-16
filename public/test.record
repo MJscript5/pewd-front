@@ -1,5 +1,5 @@
 import { db } from './app.mjs';
-import { ref, get, onValue } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+import { ref, onValue } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
 import { checkAuth, redirectToLogin } from './auth.mjs';
 
 
@@ -7,19 +7,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
         await checkAuth();
         // User is authenticated, proceed with page functionality
-        const username = sessionStorage.getItem('username');
-        if (username) {
-            const userId = await retrieveUserIdByUsername(username);
-            if (userId) {
-                fetchDataChanges();  // Proceed to fetch sensor records if user is authenticated
-            } else {
-                console.error('User ID not found for the provided username.');
-                redirectToLogin();  // Redirect to login if user ID is not found
-            }
-        } else {
-            console.error('No username found in sessionStorage.');
-            redirectToLogin();  // Redirect to login if no username is stored
-        }
+        fetchDataChanges();
     } catch (error) {
         console.error("User not logged in:", error);
         redirectToLogin();
@@ -46,44 +34,8 @@ function timeAgo(dateString) {
     }
 }
 
-// Function to retrieve user ID based on username
-async function retrieveUserIdByUsername(username) {
-    const usersRef = ref(db, 'users');
-    try {
-        const snapshot = await get(usersRef);
-        if (snapshot.exists()) {
-            const users = snapshot.val();
-            const matchedUser = Object.entries(users).find(([userId, userData]) => userData.username === username);
-
-            if (matchedUser) {
-                const [userId] = matchedUser;
-                sessionStorage.setItem('userId', userId);  // Store userId for further use
-                console.log('User ID retrieved and stored:', userId);
-                return userId;  // Return userId if needed for further processing
-            } else {
-                console.error('No user data found for the provided username.');
-                return null;
-            }
-        } else {
-            console.error('No users found in the database.');
-            return null;
-        }
-    } catch (error) {
-        console.error('Error retrieving user ID:', error);
-        return null;
-    }
-}
-
 function fetchRecords(sortOrder = 'time_desc') {
-    // Retrieve the user ID from sessionStorage and store it in a variable
-    const retrievedUserId = sessionStorage.getItem('userId');
-    if (!retrievedUserId) {
-        console.error('User ID is not available in sessionStorage. Cannot fetch user-specific records.');
-        return;
-    }
-
-    // Use the variable to create a reference to the user's specific records
-    const recordsRef = ref(db, `users/${retrievedUserId}/records`);
+    const recordsRef = ref(db, 'Sensor/Record');
 
     onValue(recordsRef, (snapshot) => {
         const recordsContainer = document.getElementById('recordsContainer');
@@ -143,7 +95,6 @@ function fetchRecords(sortOrder = 'time_desc') {
         console.error('Error fetching records:', error);
     });
 }
-
 
 // Function to handle sorting based on user selection
 function fetchDataChanges() {

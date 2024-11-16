@@ -1,6 +1,6 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getDatabase, ref, onValue, set, push, get, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyDO9p6D7W1XnL4tGNv3cLC-_hE-B02D3-0",
@@ -16,86 +16,78 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const auth = getAuth(app);
 
+// Function to sign up a new user using Firebase Authentication
+export async function signUpUser(email, password) {
+    try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        console.log('User signed up:', user);
+        return user;
+    } catch (error) {
+        console.error('Error signing up:', error);
+        throw new Error(error.message);
+    }
+}
+
+// Function to sign in a user using Firebase Authentication
+export async function signInUser(email, password) {
+    try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        console.log('User signed in:', user);
+        return user;
+    } catch (error) {
+        console.error('Error signing in:', error);
+        throw new Error(error.message);
+    }
+}
+
+// Function to sign out the current user
+export async function signOutUser() {
+    try {
+        await signOut(auth);
+        console.log('User signed out.');
+    } catch (error) {
+        console.error('Error signing out:', error);
+        throw new Error(error.message);
+    }
+}
+
+// Function to add a new record
+export function addNewRecord(postureData, date, time) {
+    const newRecordId = generateUniqueId(); // Generate a unique ID for the record
+    const recordRef = ref(db, 'Sensor/Record/' + newRecordId);
+    
+    set(recordRef, {
+        Posture: postureData,
+        Date: date,
+        PhilippineTime: time
+    }).then(() => {
+        console.log('Record added successfully.');
+    }).catch((error) => {
+        console.error('Error adding record:', error);
+    });
+}
+
+// Function to generate a unique ID for each record
+function generateUniqueId() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    const milliseconds = String(now.getMilliseconds()).padStart(3, '0'); // Optional milliseconds
+    const randomStr = Math.random().toString(36).substr(2, 5); // Optional random string
+
+    // Combine into the desired format with added uniqueness
+    return `${year}${month}${day}${hours}${minutes}${seconds}${milliseconds}-${randomStr}`;
+}
+
 let lastPosture = null;
 
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        const usersRef = ref(db, 'users');
-        get(usersRef).then((snapshot) => {
-            if (snapshot.exists()) {
-                const users = snapshot.val();
-                const matchedUser = Object.entries(users).find(([userId, userData]) => userData.email === user.email);
-
-                if (matchedUser) {
-                    const [userId] = matchedUser;
-                    sessionStorage.setItem('userId', userId);  // Store userId for further use
-                } else {
-                    console.error('No user data found for the authenticated user.');
-                }
-            } else {
-                console.error('No users found in the database.');
-            }
-        }).catch((error) => {
-            console.error('Error fetching user data:', error);
-        });
-    } else {
-        console.error('User is not authenticated.');
-    }
-});
-
-export async function addNewRecord(postureData, date, time) {
-    try {
-        const newRecordId = generateUniqueId();
-        const userId = sessionStorage.getItem('userId');
-        
-        if (userId) {
-            const recordsRef = ref(db, `users/${userId}/records`);
-            const snapshot = await get(recordsRef);
-
-            if (snapshot.exists()) {
-                const records = snapshot.val();
-                const isDuplicate = Object.values(records).some(record => 
-                    record.Posture === postureData && record.Date === date && record.PhilippineTime === time
-                );
-
-                if (isDuplicate) {
-                    console.log('Duplicate record detected. Skipping addition.');
-                    return;
-                }
-            }
-
-            await set(ref(db, `users/${userId}/records/${newRecordId}`), {
-                Posture: postureData,
-                Date: date,
-                PhilippineTime: time
-            });
-            console.log('Record added successfully to user\'s node.');
-        } else {
-            console.error('No userId found in sessionStorage.');
-        }
-    } catch (error) {
-        console.error('Error adding record to user\'s node:', error);
-    }
-}
-
-export async function transferTempRecords(userId) {
-    const tempRecordsRef = ref(db, 'tempRecords');
-    const userRecordsRef = ref(db, `users/${userId}/records`);
-
-    try {
-        const snapshot = await get(tempRecordsRef);
-        if (snapshot.exists()) {
-            const tempRecords = snapshot.val();
-            await set(userRecordsRef, tempRecords);
-            await remove(tempRecordsRef);
-            console.log('Temporary records transferred successfully.');
-        }
-    } catch (error) {
-        console.error('Error transferring temporary records:', error);
-    }
-}
-
-export function fetchLastPosture() {
+function fetchLastPosture() {
     return new Promise((resolve, reject) => {
         const lastPostureRef = ref(db, '/Sensor/LastPosture');
         onValue(lastPostureRef, (snapshot) => {
@@ -111,11 +103,6 @@ export function fetchLastPosture() {
     });
 }
 
-export function setLastPosture(posture) {
-    lastPosture = posture;
-    set(ref(db, '/Sensor/LastPosture'), posture);
-}
-
 function watchPostureChanges() {
     const postureRef = ref(db, '/Sensor/Posture');
 
@@ -129,14 +116,13 @@ function watchPostureChanges() {
 
                 console.log('Current Posture:', postureData);
 
-                if ((lastPosture === 'Good Posture!' && postureData === 'Bad Posture Detected!') ||
-                    (lastPosture === 'Bad Posture Detected!' && postureData === 'Good Posture!')) {
-                    if (lastPosture !== postureData) {
-                        addNewRecord(postureData, date, time); 
-                        setLastPosture(postureData);
-                    }
+                // Check if the posture has changed from "good" to "bad" or vice versa
+                if ((lastPosture === 'Good Posture!' && postureData === 'Bad Posture Detected!') || (lastPosture === 'Bad Posture Detected!' && postureData === 'Good Posture!')) {
+                    addNewRecord(postureData, date, time);
+                    // Update the last posture in the database
+                    set(ref(db, '/Sensor/LastPosture'), postureData);
                 }
-                lastPosture = postureData;
+                lastPosture = postureData; // Update the lastPosture to the current one
             }
         }, (error) => {
             console.error('Error fetching posture data:', error);
@@ -146,47 +132,7 @@ function watchPostureChanges() {
     });
 }
 
-function generateUniqueId() {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    const seconds = String(now.getSeconds()).padStart(2, '0');
-    const milliseconds = String(now.getMilliseconds()).padStart(3, '0');
-    const randomStr = Math.random().toString(36).substr(2, 5);
-
-    return `${year}${month}${day}${hours}${minutes}${seconds}${milliseconds}-${randomStr}`;
-}
-
-// async function fetchUserData(username) {
-//     const usersRef = ref(db, 'users');
-//     try {
-//         const snapshot = await get(usersRef);
-//         if (snapshot.exists()) {
-//             const users = snapshot.val();
-//             const matchedUser = Object.entries(users).find(([userId, userData]) => userData.username === username);
-
-//             if (matchedUser) {
-//                 const [userId, userData] = matchedUser;
-//                 sessionStorage.setItem('userId', userId);  // Store userId for further use
-
-//                 if(userData.profilePicture) {
-//                     document.getElementById('profile-picture').src = userData.profilePicture;
-//                 }
-//                 populateUserProfile(userData, userId);
-//             } else {
-//                 console.error('No user data found for the provided username.');
-//             }
-//         } else {
-//             console.error('No users found in the database.');
-//         }
-//     } catch (error) {
-//         console.error('Error fetching user data:', error);
-//     }
-// }
-
+// Call the function to start watching for posture changes
 document.addEventListener('DOMContentLoaded', () => {
     watchPostureChanges();
 });
