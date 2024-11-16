@@ -43,13 +43,15 @@ onAuthStateChanged(auth, (user) => {
     }
 });
 
-export function addNewRecord(postureData, date, time) {
-    const newRecordId = generateUniqueId();
-    const userId = sessionStorage.getItem('userId');  // Retrieve userId from sessionStorage
+export async function addNewRecord(postureData, date, time) {
+    try {
+        const newRecordId = generateUniqueId();
+        const userId = sessionStorage.getItem('userId');
+        
+        if (userId) {
+            const recordsRef = ref(db, `users/${userId}/records`);
+            const snapshot = await get(recordsRef);
 
-    if (userId) {
-        const recordsRef = ref(db, `users/${userId}/records`);
-        get(recordsRef).then((snapshot) => {
             if (snapshot.exists()) {
                 const records = snapshot.val();
                 const isDuplicate = Object.values(records).some(record => 
@@ -62,21 +64,17 @@ export function addNewRecord(postureData, date, time) {
                 }
             }
 
-            const recordRef = ref(db, `users/${userId}/records/${newRecordId}`);
-            set(recordRef, {
+            await set(ref(db, `users/${userId}/records/${newRecordId}`), {
                 Posture: postureData,
                 Date: date,
                 PhilippineTime: time
-            }).then(() => {
-                console.log('Record added successfully to user\'s node.');
-            }).catch((error) => {
-                console.error('Error adding record to user\'s node:', error);
             });
-        }).catch((error) => {
-            console.error('Error checking for duplicate records:', error);
-        });
-    } else {
-        console.error('No userId found in sessionStorage.');
+            console.log('Record added successfully to user\'s node.');
+        } else {
+            console.error('No userId found in sessionStorage.');
+        }
+    } catch (error) {
+        console.error('Error adding record to user\'s node:', error);
     }
 }
 
@@ -162,32 +160,32 @@ function generateUniqueId() {
     return `${year}${month}${day}${hours}${minutes}${seconds}${milliseconds}-${randomStr}`;
 }
 
-async function fetchUserData(username) {
-    const usersRef = ref(db, 'users');
-    try {
-        const snapshot = await get(usersRef);
-        if (snapshot.exists()) {
-            const users = snapshot.val();
-            const matchedUser = Object.entries(users).find(([userId, userData]) => userData.username === username);
+// async function fetchUserData(username) {
+//     const usersRef = ref(db, 'users');
+//     try {
+//         const snapshot = await get(usersRef);
+//         if (snapshot.exists()) {
+//             const users = snapshot.val();
+//             const matchedUser = Object.entries(users).find(([userId, userData]) => userData.username === username);
 
-            if (matchedUser) {
-                const [userId, userData] = matchedUser;
-                sessionStorage.setItem('userId', userId);  // Store userId for further use
+//             if (matchedUser) {
+//                 const [userId, userData] = matchedUser;
+//                 sessionStorage.setItem('userId', userId);  // Store userId for further use
 
-                if(userData.profilePicture) {
-                    document.getElementById('profile-picture').src = userData.profilePicture;
-                }
-                populateUserProfile(userData, userId);
-            } else {
-                console.error('No user data found for the provided username.');
-            }
-        } else {
-            console.error('No users found in the database.');
-        }
-    } catch (error) {
-        console.error('Error fetching user data:', error);
-    }
-}
+//                 if(userData.profilePicture) {
+//                     document.getElementById('profile-picture').src = userData.profilePicture;
+//                 }
+//                 populateUserProfile(userData, userId);
+//             } else {
+//                 console.error('No user data found for the provided username.');
+//             }
+//         } else {
+//             console.error('No users found in the database.');
+//         }
+//     } catch (error) {
+//         console.error('Error fetching user data:', error);
+//     }
+// }
 
 document.addEventListener('DOMContentLoaded', () => {
     watchPostureChanges();
