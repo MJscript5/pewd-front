@@ -1,6 +1,6 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getDatabase, ref, onValue, set, push, get, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyDO9p6D7W1XnL4tGNv3cLC-_hE-B02D3-0",
@@ -35,6 +35,7 @@ export async function signInUser(email, password) {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
         console.log('User signed in:', user);
+        await transferTempRecords(user.uid); // Transfer temporary records after sign-in
         return user;
     } catch (error) {
         console.error('Error signing in:', error);
@@ -54,8 +55,9 @@ export async function signOutUser() {
 }
 
 // Function to add a new record
-export function addNewRecord(postureData, date, time) {
-    const newRecordId = generateUniqueId(); // Generate a unique ID for the record
+async function addRecord(postureData, date, time) {
+
+    const newRecordId = generateUniqueId();
     const recordRef = ref(db, 'Sensor/Record/' + newRecordId);
     
     set(recordRef, {
@@ -67,7 +69,64 @@ export function addNewRecord(postureData, date, time) {
     }).catch((error) => {
         console.error('Error adding record:', error);
     });
+
+    const record = { Posture: postureData, Date: date, PhilippineTime: time };
+    const user = auth.currentUser;
+
+    if (user) {
+        // User is logged in, store in their records
+        const userRecordsRef = ref(db, `users/${retrievedUserId}/records/${newRecordId}`);
+        await set(userRecordsRef, record);
+        console.log('Generated Record ID:', newRecordId);
+
+    } else {
+        // User is not logged in, store in temporary records
+        const tempRecordsRef = ref(db, `Sensor/tempRecords/${newRecordId}`);
+        await set(tempRecordsRef, record);
+        console.log('Temp Generated Record ID:', newRecordId);
+    }
 }
+
+// Retrieve the user ID from sessionStorage and store it in a variable
+const retrievedUserId = sessionStorage.getItem('userId');
+if (!retrievedUserId) {
+    console.error('User ID is not available in sessionStorage. Cannot fetch user-specific records.');
+    // return;
+}
+
+async function transferTempRecords(userId) {
+    console.log('Transferring temp records for user:', userId); // Check if the function is being called
+    const tempRecordsRef = ref(db, 'Sensor/tempRecords'); // Correct path for temp records
+    const userRecordsBaseRef = ref(db, `users/${retrievedUserId}/records`); // Base path
+
+    try {
+        const tempRecordsSnapshot = await get(tempRecordsRef);
+
+        if (tempRecordsSnapshot.exists()) {
+            const tempRecords = tempRecordsSnapshot.val();
+            console.log('Temp records found:', tempRecords); // Log the retrieved records
+
+            for (const [key, record] of Object.entries(tempRecords)) {
+                const newRecordId = generateUniqueId(); // Use a new unique ID for each record
+                const newRecordRefPath = `users/${retrievedUserId}/records/${newRecordId}`;
+                console.log('Setting record at path:', newRecordRefPath); // Debug the path
+
+                const newRecordRef = ref(db, newRecordRefPath);
+                await set(newRecordRef, record); // Set the record under the user's path
+                await remove(ref(db, `Sensor/tempRecords/${key}`)); // Remove the temp record
+            }
+
+            console.log('All temp records transferred successfully.');
+        } else {
+            console.log('No temp records to transfer.');
+        }
+    } catch (error) {
+        console.error('Error transferring temp records:', error);
+    }
+}
+
+
+
 
 // Function to generate a unique ID for each record
 function generateUniqueId() {
@@ -105,36 +164,37 @@ function fetchLastPosture() {
 
 function watchPostureChanges() {
     const postureRef = ref(db, '/Sensor/Posture');
+    let lastPosture = null;
 
-    fetchLastPosture().then(() => {
-        onValue(postureRef, (snapshot) => {
-            if (snapshot.exists()) {
-                const postureData = snapshot.val();
-                const now = new Date();
-                const date = now.toLocaleDateString();
-                const time = now.toLocaleTimeString('en-US', { hour12: false, timeZone: 'Asia/Manila' });
+    onValue(postureRef, (snapshot) => {
+        if (snapshot.exists()) {
+            const postureData = snapshot.val();
+            const now = new Date();
+            const date = now.toLocaleDateString();
+            const time = now.toLocaleTimeString('en-US', { hour12: false, timeZone: 'Asia/Manila' });
 
-                console.log('Current Posture:', postureData);
-
-                // Check if the posture has changed from "good" to "bad" or vice versa
-                if ((lastPosture === 'Good Posture!' && postureData === 'Bad Posture Detected!') || (lastPosture === 'Bad Posture Detected!' && postureData === 'Good Posture!')) {
-                    addNewRecord(postureData, date, time);
-                    // Update the last posture in the database
-                    set(ref(db, '/Sensor/LastPosture'), postureData);
-                }
-                lastPosture = postureData; // Update the lastPosture to the current one
+            if ((lastPosture === 'Good Posture!' && postureData === 'Bad Posture Detected!') ||
+                (lastPosture === 'Bad Posture Detected!' && postureData === 'Good Posture!')) {
+                addRecord(postureData, date, time);
             }
-        }, (error) => {
-            console.error('Error fetching posture data:', error);
-        });
-    }).catch((error) => {
-        console.error('Error fetching last posture:', error);
+            lastPosture = postureData;
+        }
     });
 }
+
+// Handle auth state changes
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        // console.log('User is logged in:', user.uid);
+        transferTempRecords(user.uid);
+    } else {
+        console.log('User is logged out');
+    }
+});
 
 // Call the function to start watching for posture changes
 document.addEventListener('DOMContentLoaded', () => {
     watchPostureChanges();
 });
 
-export { db, auth };
+export { db, auth, addRecord, transferTempRecords, watchPostureChanges };

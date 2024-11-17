@@ -1,7 +1,6 @@
 import { onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { auth } from './app.mjs';
+import { auth, db, transferTempRecords } from './app.mjs';
 import { ref, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-import { db } from './app.mjs';
 
 export function checkAuth() {
   return new Promise((resolve, reject) => {

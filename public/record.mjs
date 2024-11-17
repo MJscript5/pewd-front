@@ -58,7 +58,7 @@ async function retrieveUserIdByUsername(username) {
             if (matchedUser) {
                 const [userId] = matchedUser;
                 sessionStorage.setItem('userId', userId);  // Store userId for further use
-                console.log('User ID retrieved and stored:', userId);
+                // console.log('User ID retrieved and stored:', userId);
                 return userId;  // Return userId if needed for further processing
             } else {
                 console.error('No user data found for the provided username.');

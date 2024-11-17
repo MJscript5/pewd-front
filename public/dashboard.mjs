@@ -46,13 +46,13 @@ function updateData() {
                 // postureStatusIcon.className = "good";
                 rand.innerText = postData;
                 rand.className = "good";
-                console.log("Applied good class");
+                // console.log("Applied good class");
             } else if (postData === "Bad Posture Detected!" && lastStatus !== "bad") {
                 postureStatusImage.src = "pics/1.png";
                 // postureStatusIcon.className = "bad";
                 rand.innerText = postData;
                 rand.className = "bad";
-                console.log("Applied bad class");
+                // console.log("Applied bad class");
 
                 // Send push notification if posture status is bad
                 showNotification();
