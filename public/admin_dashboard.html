@@ -14,8 +14,46 @@
                 <img src="pics/logo.png" alt="MMCM Posture Checker Logo">
                 <h1>MMCM Posture Checker</h1>
             </div>
-            <button class="btn" id="logoutBtn">Logout</button>
+        
+            <!-- Admin Dropdown Menu -->
+            <div class="admin-menu">
+                <div class="admin-icon" id="adminDropdown">
+                    <img src="pics/admin.png" alt="Admin Icon" class="admin-avatar">
+                    <span id="adminFullName">Admin Name</span>
+                </div>
+                <nav class="admin-nav">
+                    <div class="dropdown">
+                        <div class="dropdown-content">
+                            <a id="updateEmailBtn">Update Email</a>
+                            <a id="deleteAccountBtn">Delete Admin Account</a>
+                            <a id="logoutBtn">Logout</a>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+            
         </header>
+        
+        <!-- Update Email Modal -->
+        <div id="updateEmailModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Update Email</h2>
+                <input type="email" id="newEmailInput" placeholder="Enter New Email" />
+                <button class="btn" id="verifyEmailBtn">Verify & Update</button>
+            </div>
+        </div>
+        
+        <!-- Delete Account Confirmation Modal -->
+        <div id="deleteAccountModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Confirm Account Deletion</h2>
+                <p>Are you sure you want to delete your admin account? This action cannot be undone.</p>
+                <button class="btn" id="confirmDeleteBtn">Delete Account</button>
+            </div>
+        </div>
+        
 
         <h2>Admin Dashboard</h2>
 

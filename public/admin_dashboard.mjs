@@ -1,5 +1,5 @@
 import { db } from './app.mjs';
-import { ref, onValue } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+import { ref, onValue, get } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
 
 // Redirect to login if the admin is not logged in
 if (!sessionStorage.getItem('adminEmail') && !localStorage.getItem('adminEmail')) {
@@ -185,3 +185,77 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
+// Update Email Functionality
+export function updateEmail() {
+    const newEmail = document.getElementById('newEmailInput').value;
+    if (newEmail) {
+        // Implement email update logic with verification here
+        alert(`Verification email sent to ${newEmail}. Please verify to update.`);
+    } else {
+        alert('Please enter a valid email.');
+    }
+}
+
+// Delete Admin Account
+export function deleteAdminAccount() {
+    if (confirm('Are you sure you want to delete your admin account?')) {
+        // Implement account deletion logic here
+        alert('Admin account deleted successfully.');
+        logout();
+    }
+}
+
+// Event Listeners
+document.getElementById('logoutBtn').addEventListener('click', logout);
+document.getElementById('updateEmailBtn').addEventListener('click', () => {
+    document.getElementById('updateEmailModal').style.display = 'block';
+});
+document.getElementById('deleteAccountBtn').addEventListener('click', () => {
+    document.getElementById('deleteAccountModal').style.display = 'block';
+});
+document.getElementById('verifyEmailBtn').addEventListener('click', updateEmail);
+document.getElementById('confirmDeleteBtn').addEventListener('click', deleteAdminAccount);
+document.querySelectorAll('.close').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.modal').forEach(modal => modal.style.display = 'none');
+    });
+});
+
+const adminFullName = document.getElementById('adminFullName');
+
+// Load Admin Info
+loadAdminInfo();
+
+async function loadAdminInfo() {
+    // Retrieve the admin's email from sessionStorage or localStorage
+    const adminEmail = sessionStorage.getItem('adminEmail') || localStorage.getItem('adminEmail');
+    
+    // If no admin email found, redirect to login page
+    if (!adminEmail) {
+        window.location.href = './admin_login.html';
+        return;
+    }
+
+    try {
+        // Reference to the 'admins' node in Firebase
+        const usersRef = ref(db, 'admins');
+        
+        // Fetch the data from Firebase
+        const snapshot = await get(usersRef);
+        
+        // Check if data exists
+        if (snapshot.exists()) {
+            const admins = snapshot.val();
+            
+            // Find the admin by email
+            const adminData = Object.values(admins).find(admin => admin.email === adminEmail);
+            
+            // If admin data and full name exist, display it
+            if (adminData && adminData.fullName) {
+                adminFullName.textContent = adminData.fullName;
+            }
+        }
+    } catch (error) {
+        console.error('Error fetching admin info:', error);
+    }
+}

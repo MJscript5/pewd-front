@@ -84,3 +84,104 @@ th {
     text-decoration: none;
     cursor: pointer;
 }
+
+/* Admin Menu Styles */
+.admin-menu {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.admin-icon {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.admin-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+}
+
+#adminName {
+    font-weight: bold;
+    color: white;
+}
+
+/* Dropdown Navigation */
+.admin-nav {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 200px;
+    background: white;
+    color: rgba(0, 0, 0, 0.87);
+    clip-path: circle(24px at 180px 24px);
+    transition: clip-path 0.375s;
+    z-index: 100;
+    display: none;
+}
+
+.admin-nav a {
+    display: block;
+    padding: 10px;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.admin-nav a:hover {
+    background: #ffe082;
+}
+
+.admin-nav a:active {
+    background: #ffca28;
+}
+
+.admin-menu:hover .admin-nav {
+    display: block;
+    clip-path: circle(200px at 180px 24px);
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+    background: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 500px;
+    border-radius: 8px;
+    color: #333;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+
