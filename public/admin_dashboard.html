@@ -25,21 +25,6 @@
             <button class="btn" id="fetchRecordsBtn">Fetch Records</button>
         </div>
 
-        <div class="stats-box">
-            <div class="stat">
-                <h3 id="totalUsers">0</h3>
-                <p>Total Users</p>
-            </div>
-            <div class="stat">
-                <h3 id="totalRecordsViews">0</h3>
-                <p>Total Records Views</p>
-            </div>
-            <div class="stat">
-                <h3 id="activeAdmins">0</h3>
-                <p>Active Admins</p>
-            </div>
-        </div>
-
         <table>
             <thead>
                 <tr>
@@ -51,8 +36,8 @@
                 </tr>
             </thead>
             <tbody id="userTableBody">
-                <!-- Data will be fetched from the database -->
-            </tbody>
+                <!-- User data will be populated dynamically -->
+            </tbody>            
         </table>
     </div>
 
@@ -60,15 +45,25 @@
         <div class="modal-content">
             <span class="close">&times;</span>
             <h2>User Records</h2>
+                <div class="sort-options">
+                <label for="sortOrder">Sort by Date/Time:</label>
+                <select id="sortOrder">
+                    <option value="desc">Newest First</option>
+                    <option value="asc">Oldest First</option>
+                </select>
+            </div>
+    
             <div id="recordsContent"></div>
         </div>
     </div>
+    
+       
 
     <script type="module">
-        import { logout, viewRecords, fetchUserRecords, loadUserStats } from './admin_dashboard.mjs';
-
+        import { logout, viewRecords, fetchUserRecords, loadStoredUserData } from './admin_dashboard.mjs';
+    
         document.getElementById('logoutBtn').addEventListener('click', logout);
-
+    
         // Fetch records for a specific user based on User ID input
         document.getElementById('fetchRecordsBtn').addEventListener('click', () => {
             const userId = document.getElementById('userIdInput').value;
@@ -78,20 +73,21 @@
                 alert('Please enter a valid User ID.');
             }
         });
-
-        // Load initial stats
-        loadUserStats();
-
+    
+        // Load initial stats and stored user data
+        loadStoredUserData();
+    
         // Close modal when clicking on the close button or outside the modal
         document.querySelector('.close').addEventListener('click', () => {
             document.getElementById('recordsModal').style.display = 'none';
         });
-
+    
         window.addEventListener('click', (event) => {
             if (event.target == document.getElementById('recordsModal')) {
                 document.getElementById('recordsModal').style.display = 'none';
             }
         });
     </script>
+    
 </body>
 </html>

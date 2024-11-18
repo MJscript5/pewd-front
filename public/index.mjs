@@ -17,42 +17,43 @@ async function checkLogin(username, password, rememberMe) {
         const snapshot = await get(usersRef);
         if (snapshot.exists()) {
             const users = snapshot.val();
-            const userIds = Object.keys(users);
             let userFound = false;
 
-            for (const userId of userIds) {
+            for (const userId of Object.keys(users)) {
                 const user = users[userId];
                 if (user.username === username) {
                     userFound = true;
                     try {
-                        // Attempt to sign in with Firebase Authentication
                         await signInWithEmailAndPassword(auth, user.email, password);
                         console.log('Login successful');
 
-                        // Store the username in sessionStorage after successful login
-                        sessionStorage.setItem('username', username);
+                        // Retrieve and store userId using retrieveUserIdByUsername
+                        const retrievedUserId = await retrieveUserIdByUsername(username);
+                        if (retrievedUserId) {
+                            sessionStorage.setItem('userId', retrievedUserId);
+                            sessionStorage.setItem('username', username);
 
-                        if (rememberMe) {
-                            localStorage.setItem('username', username);
-                            localStorage.setItem('rememberMe', 'true');
+                            if (rememberMe) {
+                                localStorage.setItem('username', username);
+                                localStorage.setItem('rememberMe', 'true');
+                            } else {
+                                localStorage.removeItem('username');
+                                localStorage.removeItem('rememberMe');
+                            }
+
+                            displayMessage('Login successful! Redirecting...', false);
+                            setTimeout(() => {
+                                redirectToDashboard();
+                            }, 200);
                         } else {
-                            localStorage.removeItem('username');
-                            localStorage.removeItem('rememberMe');
+                            displayMessage('User ID retrieval failed. Please try again.');
                         }
-                        displayMessage('Login successful! Redirecting...', false);
-                        setTimeout(() => {
-                            redirectToDashboard();                        
-                        }, 200);
                         return;
                     } catch (authError) {
                         console.error('Firebase Auth Error:', authError);
-                        if (authError.code === 'auth/invalid-credential') {
-                            displayMessage('Invalid username or  password. Please try again.');
-                        } else {
-                            displayMessage('An error occurred during login. Please try again.');
-                        }
+                        displayMessage('Invalid username or password. Please try again.');
                     }
-                    break; // Exit loop after finding matching username
+                    break;
                 }
             }
 
@@ -61,11 +62,39 @@ async function checkLogin(username, password, rememberMe) {
             }
         } else {
             displayMessage('No users found. Please sign up.');
-            windows.location.href = 'signup.html';
+            window.location.href = 'signup.html';
         }
     } catch (error) {
         console.error('Login Error:', error);
-        displayMessage('Invalid username or password. Please try again.');
+        displayMessage('An error occurred during login. Please try again.');
+    }
+}
+
+// Function to retrieve user ID based on username
+async function retrieveUserIdByUsername(username) {
+    const usersRef = ref(db, 'users');
+    try {
+        const snapshot = await get(usersRef);
+        if (snapshot.exists()) {
+            const users = snapshot.val();
+            const matchedUser = Object.entries(users).find(([userId, userData]) => userData.username === username);
+
+            if (matchedUser) {
+                const [userId] = matchedUser;
+                sessionStorage.setItem('userId', userId);  // Store userId for further use
+                console.log('User ID retrieved and stored:', userId);
+                return userId;  // Return userId if needed for further processing
+            } else {
+                console.error('No user data found for the provided username.');
+                return null;
+            }
+        } else {
+            console.error('No users found in the database.');
+            return null;
+        }
+    } catch (error) {
+        console.error('Error retrieving user ID:', error);
+        return null;
     }
 }
 

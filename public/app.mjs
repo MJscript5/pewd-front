@@ -30,12 +30,33 @@ export async function signUpUser(email, password) {
 }
 
 // Function to sign in a user using Firebase Authentication
+// In app.mjs
 export async function signInUser(email, password) {
     try {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
         console.log('User signed in:', user);
-        await transferTempRecords(user.uid); // Transfer temporary records after sign-in
+
+        // Retrieve the username associated with this email
+        const usersRef = ref(db, 'users');
+        const snapshot = await get(usersRef);
+        if (snapshot.exists()) {
+            const users = snapshot.val();
+            const matchedUser = Object.entries(users).find(([userId, userData]) => userData.username === username);
+
+            if (matchedUser) {
+                const [userId] = matchedUser;
+                sessionStorage.setItem('userId', userId);  // Store userId for further use
+                console.log('User ID retrieved and stored:', userId);
+                return userId;  // Return userId if needed for further processing
+            } else {
+                console.error('No user data found for the provided username.');
+                return null;
+            }
+        } else {
+            console.error('No users found in the database.');
+        }
+
         return user;
     } catch (error) {
         console.error('Error signing in:', error);
@@ -87,33 +108,31 @@ async function addRecord(postureData, date, time) {
     }
 }
 
-// Retrieve the user ID from sessionStorage and store it in a variable
-const retrievedUserId = sessionStorage.getItem('userId');
-if (!retrievedUserId) {
-    console.error('User ID is not available in sessionStorage. Cannot fetch user-specific records.');
-    // return;
-}
+async function transferTempRecords() {
+    const retrievedUserId = sessionStorage.getItem('userId');
 
-async function transferTempRecords(userId) {
-    console.log('Transferring temp records for user:', userId); // Check if the function is being called
-    const tempRecordsRef = ref(db, 'Sensor/tempRecords'); // Correct path for temp records
-    const userRecordsBaseRef = ref(db, `users/${retrievedUserId}/records`); // Base path
+    if (!retrievedUserId) {
+        console.error('User ID not available in session storage. Cannot transfer temp records.');
+        return;
+    }
+
+    console.log('Transferring temp records for user:', retrievedUserId);
+    const tempRecordsRef = ref(db, 'Sensor/tempRecords');
+    const userRecordsBaseRef = ref(db, `users/${retrievedUserId}/records`);
 
     try {
         const tempRecordsSnapshot = await get(tempRecordsRef);
 
         if (tempRecordsSnapshot.exists()) {
             const tempRecords = tempRecordsSnapshot.val();
-            console.log('Temp records found:', tempRecords); // Log the retrieved records
+            console.log('Temp records found:', tempRecords);
 
             for (const [key, record] of Object.entries(tempRecords)) {
-                const newRecordId = generateUniqueId(); // Use a new unique ID for each record
-                const newRecordRefPath = `users/${retrievedUserId}/records/${newRecordId}`;
-                console.log('Setting record at path:', newRecordRefPath); // Debug the path
+                const newRecordId = generateUniqueId();
+                const newRecordRef = ref(db, `users/${retrievedUserId}/records/${newRecordId}`);
 
-                const newRecordRef = ref(db, newRecordRefPath);
-                await set(newRecordRef, record); // Set the record under the user's path
-                await remove(ref(db, `Sensor/tempRecords/${key}`)); // Remove the temp record
+                await set(newRecordRef, record);
+                await remove(ref(db, `Sensor/tempRecords/${key}`));
             }
 
             console.log('All temp records transferred successfully.');
@@ -124,9 +143,6 @@ async function transferTempRecords(userId) {
         console.error('Error transferring temp records:', error);
     }
 }
-
-
-
 
 // Function to generate a unique ID for each record
 function generateUniqueId() {
