@@ -46,9 +46,9 @@ export async function signInUser(email, password) {
 
             if (matchedUser) {
                 const [userId] = matchedUser;
-                sessionStorage.setItem('userId', userId);  // Store userId for further use
+                sessionStorage.setItem('userId', userId);  
                 console.log('User ID retrieved and stored:', userId);
-                return userId;  // Return userId if needed for further processing
+                return userId;  
             } else {
                 console.error('No user data found for the provided username.');
                 return null;
@@ -77,7 +77,7 @@ export async function signOutUser() {
 
 // Global variable to store the latest posture data
 let latestPostureData = null;
-let unloadTriggered = false; // Flag to prevent multiple triggers of beforeunload
+let unloadTriggered = false; 
 
 // Function to update the latest posture data
 function updateLatestPostureData(postureData) {
@@ -93,8 +93,8 @@ async function getLastPostureRecord(refPath) {
 
     if (snapshot.exists()) {
         const records = snapshot.val();
-        const lastRecordKey = Object.keys(records).pop(); // Get the last key
-        return records[lastRecordKey].Posture; // Return the last posture status
+        const lastRecordKey = Object.keys(records).pop(); 
+        return records[lastRecordKey].Posture; 
     }
     return null;
 }
@@ -189,7 +189,7 @@ async function addRecord(postureData, date, time) {
 
 // Function to save to tempRecords when the app is closed or index page is opened
 async function saveToTempRecordsOnUnload(date, time) {
-    if (unloadTriggered || !latestPostureData) return; // Prevent multiple triggers and ensure valid posture data
+    if (unloadTriggered || !latestPostureData) return; 
     unloadTriggered = true;
 
     const lastTempPosture = await getLastPostureRecord(`Sensor/tempRecords`);
@@ -234,7 +234,7 @@ async function transferTempRecords() {
     const retrievedUserId = sessionStorage.getItem('userId');
 
     if (!retrievedUserId) {
-        console.error('User ID not available in session storage. Cannot transfer temp records.');
+        // console.error('User ID not available in session storage. Cannot transfer temp records.');
         return;
     }
 
@@ -275,8 +275,8 @@ function generateUniqueId() {
     const hours = String(now.getHours()).padStart(2, '0');
     const minutes = String(now.getMinutes()).padStart(2, '0');
     const seconds = String(now.getSeconds()).padStart(2, '0');
-    const milliseconds = String(now.getMilliseconds()).padStart(3, '0'); // Optional milliseconds
-    const randomStr = Math.random().toString(36).substr(2, 5); // Optional random string
+    const milliseconds = String(now.getMilliseconds()).padStart(3, '0'); 
+    const randomStr = Math.random().toString(36).substr(2, 5);
 
     // Combine into the desired format with added uniqueness
     return `${year}${month}${day}${hours}${minutes}${seconds}${milliseconds}-${randomStr}`;
