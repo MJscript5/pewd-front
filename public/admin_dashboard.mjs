@@ -255,6 +255,9 @@ async function loadAdminInfo() {
                 adminFullName.textContent = adminData.fullName;
             }
         }
+
+        // Load stored user data
+        loadStoredUserData();
     } catch (error) {
         console.error('Error fetching admin info:', error);
     }

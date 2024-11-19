@@ -86,8 +86,8 @@ async function handleFormSubmit(e) {
 
 function redirectToPreviousPage() {
     const previousPage = document.referrer;
-    if (previousPage.includes('index.html')) {
-        window.location.href = 'index.html';
+    if (previousPage.includes('login.html')) {
+        window.location.href = 'login.html';
     } else {
         window.location.href = 'admin_login.html';
     }

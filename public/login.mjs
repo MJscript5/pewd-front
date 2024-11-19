@@ -100,7 +100,7 @@ async function retrieveUserIdByUsername(username) {
 
 document.addEventListener('DOMContentLoaded', async () => {
     try {
-        // const loginPage = window.location.pathname.includes('index.html');
+        // const loginPage = window.location.pathname.includes('login.html');
         if (!loginPage) { // Only redirect if not on login page
             await checkAuth(); // User is already logged in, redirect to dashboard
             redirectToDashboard();

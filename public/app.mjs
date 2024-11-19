@@ -30,12 +30,12 @@ export async function signUpUser(email, password) {
 }
 
 // Function to sign in a user using Firebase Authentication
-// In app.mjs
 export async function signInUser(email, password) {
     try {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
         console.log('User signed in:', user);
+        await transferTempRecords(user.uid); 
 
         // Retrieve the username associated with this email
         const usersRef = ref(db, 'users');
@@ -75,38 +75,160 @@ export async function signOutUser() {
     }
 }
 
-// Function to add a new record
-async function addRecord(postureData, date, time) {
+// Global variable to store the latest posture data
+let latestPostureData = null;
+let unloadTriggered = false; // Flag to prevent multiple triggers of beforeunload
 
-    const newRecordId = generateUniqueId();
-    const recordRef = ref(db, 'Sensor/Record/' + newRecordId);
-    
-    set(recordRef, {
+// Function to update the latest posture data
+function updateLatestPostureData(postureData) {
+    if (postureData && postureData !== "Unknown") {
+        latestPostureData = postureData;
+    }
+}
+
+// Helper function to fetch the latest record posture
+async function getLastPostureRecord(refPath) {
+    const recordsRef = ref(db, refPath);
+    const snapshot = await get(recordsRef);
+
+    if (snapshot.exists()) {
+        const records = snapshot.val();
+        const lastRecordKey = Object.keys(records).pop(); // Get the last key
+        return records[lastRecordKey].Posture; // Return the last posture status
+    }
+    return null;
+}
+
+// Function to add a new record (for users, admins, or when no user is signed in)
+async function addRecord(postureData, date, time) {
+    if (!postureData || postureData === "Unknown") {
+        console.log('Invalid posture data. Record creation skipped.');
+        return;
+    }
+
+    const newRecordId = `${generateUniqueId()}`;
+    const record = {
         Posture: postureData,
         Date: date,
-        PhilippineTime: time
-    }).then(() => {
-        console.log('Record added successfully.');
-    }).catch((error) => {
-        console.error('Error adding record:', error);
-    });
+        PhilippineTime: time,
+    };
 
-    const record = { Posture: postureData, Date: date, PhilippineTime: time };
+    // Check for duplicate posture in Sensor/Record
+    const lastPosture = await getLastPostureRecord(`Sensor/Record`);
+    if (lastPosture === postureData) {
+        console.log('Duplicate posture detected in Sensor/Record. Skipping record creation.');
+        return;
+    }
+
+    // Store the record data in the general Sensor/Record node
+    try {
+        await set(ref(db, `Sensor/Record/${newRecordId}`), record);
+        console.log('Record added successfully to Sensor/Record.');
+    } catch (error) {
+        console.error('Error adding record to Sensor/Record:', error);
+        return;
+    }
+
     const user = auth.currentUser;
 
     if (user) {
-        // User is logged in, store in their records
-        const userRecordsRef = ref(db, `users/${retrievedUserId}/records/${newRecordId}`);
-        await set(userRecordsRef, record);
-        console.log('Generated Record ID:', newRecordId);
+        const userId = user.uid;
 
+        // Check if the logged-in user is an admin
+        const adminRef = ref(db, `admins/${userId}`);
+        const snapshot = await get(adminRef);
+
+        if (snapshot.exists()) {
+            // Admin account detected, check for duplicates in tempRecords
+            const lastTempPosture = await getLastPostureRecord(`Sensor/tempRecords`);
+            if (lastTempPosture === postureData) {
+                console.log('Duplicate posture detected in tempRecords. Skipping record creation.');
+                return;
+            }
+
+            const tempRecordsRef = ref(db, `Sensor/tempRecords/${newRecordId}`);
+            try {
+                await set(tempRecordsRef, record);
+                console.log('Admin account detected. Record added to tempRecords.');
+            } catch (error) {
+                console.error('Error adding record to tempRecords:', error);
+            }
+        } else {
+            // User account detected, check for duplicates in user records
+            const lastUserPosture = await getLastPostureRecord(`users/${retrievedUserId}/records`);
+            if (lastUserPosture === postureData) {
+                console.log('Duplicate posture detected in user records. Skipping record creation.');
+                return;
+            }
+
+            const userRecordsRef = ref(db, `users/${retrievedUserId}/records/${newRecordId}`);
+            try {
+                await set(userRecordsRef, record);
+                console.log('Record added to user account. Generated Record ID:', newRecordId);
+            } catch (error) {
+                console.error('Error adding record to user account:', error);
+            }
+        }
     } else {
-        // User is not logged in, store in temporary records
+        // No user is logged in, check for duplicates in tempRecords
+        const lastTempPosture = await getLastPostureRecord(`Sensor/tempRecords`);
+        if (lastTempPosture === postureData) {
+            console.log('Duplicate posture detected in tempRecords. Skipping record creation.');
+            return;
+        }
+
         const tempRecordsRef = ref(db, `Sensor/tempRecords/${newRecordId}`);
-        await set(tempRecordsRef, record);
-        console.log('Temp Generated Record ID:', newRecordId);
+        try {
+            await set(tempRecordsRef, record);
+            console.log('No logged-in account detected. Record added to tempRecords.');
+        } catch (error) {
+            console.error('Error adding record to tempRecords:', error);
+        }
     }
 }
+
+// Function to save to tempRecords when the app is closed or index page is opened
+async function saveToTempRecordsOnUnload(date, time) {
+    if (unloadTriggered || !latestPostureData) return; // Prevent multiple triggers and ensure valid posture data
+    unloadTriggered = true;
+
+    const lastTempPosture = await getLastPostureRecord(`Sensor/tempRecords`);
+    if (lastTempPosture === latestPostureData) {
+        console.log('Duplicate posture detected in tempRecords on unload. Skipping record creation.');
+        return;
+    }
+
+    const newRecordId = `${generateUniqueId()}-${Date.now()}`;
+    const record = {
+        Posture: latestPostureData,
+        Date: date,
+        PhilippineTime: time,
+    };
+
+    const tempRecordsRef = ref(db, `Sensor/tempRecords/${newRecordId}`);
+    try {
+        await set(tempRecordsRef, record);
+        console.log('Record added to tempRecords on unload or index page load.');
+    } catch (error) {
+        console.error('Error adding record to tempRecords on unload:', error);
+    }
+}
+
+// Add event listener for beforeunload (when the app is closed or refreshed)
+window.addEventListener('beforeunload', () => {
+    const date = new Date().toLocaleDateString();
+    const time = new Date().toLocaleTimeString();
+    saveToTempRecordsOnUnload(date, time);
+});
+
+// Call saveToTempRecordsOnUnload on index page load
+if (window.location.pathname.includes('index')) {
+    const date = new Date().toLocaleDateString();
+    const time = new Date().toLocaleTimeString();
+    saveToTempRecordsOnUnload(date, time);
+}
+
+
 
 async function transferTempRecords() {
     const retrievedUserId = sessionStorage.getItem('userId');

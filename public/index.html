@@ -1,38 +1,158 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="icon" href="pics/logo2.png" type="image/x-icon">
-        <link rel="stylesheet" href="css/login.css">
-        <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-        <title>Posture Checker - Login</title>
-    </head>
-    <body>
-        <div class="container">
-            <img src="pics/logo.png" alt="Posture Checker Logo" class="logo">
-            <h1>Posture Checker</h1>
-            <form id="login-form" class="login-form">
-                <h2>Login</h2>
-                <div class="input-box">
-                    <input type="text" id="username" name="username" placeholder="Username" required>
-                </div>
-                <div class="input-box password-container">
-                    <input type="password" id="password" name="password" placeholder="Password" required>
-                    <i class='bx bx-hide toggle-password' id="toggle-password-icon" onclick="togglePasswordVisibility()"></i>
-                </div>
-                <div class="login-message" role="alert" aria-live="assertive"></div>
-                <div class="remember-forgot">
-                    <label><input type="checkbox" id="remember-me" name="remember-me"> Remember me</label>
-                    <a href="forgotpassword.html">Forgot Password?</a>
-                </div>
-                <button type="submit" class="btn">Login</button>
-            </form>
-            <p class="create-account">Don't have an account? <a href="signup.html">Create Account</a></p>
-        </div>
-        
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="pics/logo.png"> 
+    <title>Posture Checker - Welcome</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #285483;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .logo-container {
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+        }
+        .logo {
+            max-width: 150px;
+            height: auto;
+        }
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+        }
+        .continue-text {
+            font-size: 1.2rem;
+            color: #555;
+            margin-bottom: 1rem;
+        }
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .button-container button {
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #007BFF;
+            color: white;
+            transition: background-color 0.3s ease;
+        }
+        .button-container button:hover {
+            background-color: #0056b3;
+        }
 
-        <script type="module" src="index.mjs"></script>
-    </body>
+        /* Media Queries */
+        @media screen and (max-width: 768px) {
+            .container {
+                width: 95%;
+                padding: 1.5rem;
+            }
+            h1 {
+                font-size: 1.75rem;
+            }
+            .continue-text {
+                font-size: 1.1rem;
+            }
+            .button-container button {
+                padding: 0.6rem 1.2rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            .logo {
+                max-width: 120px;
+            }
+            .container {
+                padding: 1rem;
+            }
+            h1 {
+                font-size: 1.5rem;
+                margin-bottom: 1rem;
+            }
+            .continue-text {
+                font-size: 1rem;
+                margin-bottom: 0.75rem;
+            }
+            .button-container button {
+                padding: 0.5rem 1rem;
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="logo-container">
+        <img src="pics/logo.png" alt="Posture Checker Logo" class="logo">
+    </div>
+    <div class="container">
+        <h1>Welcome to Posture Checker</h1>
+        <p class="continue-text">Continue as:</p>
+        <div class="button-container">
+            <button onclick="location.href='admin_login.html'">Admin</button>
+            <button onclick="location.href='login.html'">User</button>
+        </div>
+    </div>
+
+    <!-- Code injected by live-server -->
+    <script>
+        // <![CDATA[  <-- For SVG support
+        if ('WebSocket' in window) {
+            (function () {
+                function refreshCSS() {
+                    var sheets = [].slice.call(document.getElementsByTagName("link"));
+                    var head = document.getElementsByTagName("head")[0];
+                    for (var i = 0; i < sheets.length; ++i) {
+                        var elem = sheets[i];
+                        var parent = elem.parentElement || head;
+                        parent.removeChild(elem);
+                        var rel = elem.rel;
+                        if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+                            var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+                            elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+                        }
+                        parent.appendChild(elem);
+                    }
+                }
+                var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+                var address = protocol + window.location.host + window.location.pathname + '/ws';
+                var socket = new WebSocket(address);
+                socket.onmessage = function (msg) {
+                    if (msg.data == 'reload') window.location.reload();
+                    else if (msg.data == 'refreshcss') refreshCSS();
+                };
+                if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+                    console.log('Live reload enabled.');
+                    sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+                }
+            })();
+        }
+        else {
+            console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+        }
+        // ]]>
+    </script>
+</body>
 </html>
