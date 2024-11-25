@@ -101,6 +101,8 @@ async function getLastPostureRecord(refPath) {
 
 // Function to add a new record (for users, admins, or when no user is signed in)
 async function addRecord(postureData, date, time) {
+    const retrievedUserId = sessionStorage.getItem('userId');
+
     if (!postureData || postureData === "Unknown") {
         console.log('Invalid posture data. Record creation skipped.');
         return;
@@ -132,41 +134,65 @@ async function addRecord(postureData, date, time) {
     const user = auth.currentUser;
 
     if (user) {
-        const userId = user.uid;
+       const userId = user.uid;
 
         // Check if the logged-in user is an admin
         const adminRef = ref(db, `admins/${userId}`);
+        try {
         const snapshot = await get(adminRef);
 
-        if (snapshot.exists()) {
-            // Admin account detected, check for duplicates in tempRecords
-            const lastTempPosture = await getLastPostureRecord(`Sensor/tempRecords`);
-            if (lastTempPosture === postureData) {
-                console.log('Duplicate posture detected in tempRecords. Skipping record creation.');
-                return;
-            }
+            if (snapshot.exists()) {
+                // Admin account detected, check for duplicates in tempRecords
+                const lastTempPosture = await getLastPostureRecord(`Sensor/tempRecords`);
+                if (lastTempPosture === postureData) {
+                    console.log('Duplicate posture detected in tempRecords. Skipping record creation.');
+                    return;
+                }
 
-            const tempRecordsRef = ref(db, `Sensor/tempRecords/${newRecordId}`);
-            try {
-                await set(tempRecordsRef, record);
-                console.log('Admin account detected. Record added to tempRecords.');
-            } catch (error) {
-                console.error('Error adding record to tempRecords:', error);
+                const tempRecordsRef = ref(db, `Sensor/tempRecords/${newRecordId}`);
+                try {
+                    await set(tempRecordsRef, record);
+                    console.log('Admin account detected. Record added to tempRecords.');
+                } catch (error) {
+                    console.error('Error adding record to tempRecords:', error);
+                }
+            } else {
+                // User account detected, check for duplicates in user records
+                const lastUserPosture = await getLastPostureRecord(`users/${retrievedUserId}/records`);
+                if (lastUserPosture === postureData) {
+                    console.log('Duplicate posture detected in user records. Skipping record creation.');
+                    return;
+                }
+
+                const userRecordsRef = ref(db, `users/${retrievedUserId}/records/${newRecordId}`);
+                try {
+                    await set(userRecordsRef, record);
+                    console.log('Record added to user account. Generated Record ID:', newRecordId);
+                } catch (error) {
+                    console.error('Error adding record to user account:', error);
+                    if (error.message.includes('Permission denied')) {
+                        console.error('Check Firebase security rules for users/${retrievedUserId}/records');
+                    }
+                }
             }
-        } else {
-            // User account detected, check for duplicates in user records
+        } catch (error) {
+            console.error('Error checking admin status:', error);
+            // Proceed with user logic as a fallback
             const lastUserPosture = await getLastPostureRecord(`users/${retrievedUserId}/records`);
             if (lastUserPosture === postureData) {
                 console.log('Duplicate posture detected in user records. Skipping record creation.');
                 return;
             }
-
+    
             const userRecordsRef = ref(db, `users/${retrievedUserId}/records/${newRecordId}`);
             try {
                 await set(userRecordsRef, record);
-                console.log('Record added to user account. Generated Record ID:', newRecordId);
+                console.log('Record added to user account (fallback). Generated Record ID:', newRecordId);
             } catch (error) {
-                console.error('Error adding record to user account:', error);
+                console.error('Error adding record to user account (fallback):', error);
+                if (error.message.includes('Permission denied')) {
+                    console.error(`Check Firebase security rules for users/${retrievedUserId}/records`);
+              }
             }
         }
     } else {
