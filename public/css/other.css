@@ -8,7 +8,7 @@
 body {
     background: #285483;
     font-family: 'Rubik', sans-serif;
-    font-size: 1.25rem; 
+    font-size: 0.75rem;
     margin: 0;
     padding: 2rem;
     min-height: 100vh;
@@ -18,15 +18,10 @@ body {
     opacity: 0;
     animation: fadeIn 0.5s forwards;
     transition: opacity 0.5s ease-in-out;
+    padding-top: 80px; 
 }
 
 @keyframes fadeIn {
-    to {
-        opacity: 1;
-    }
-}
-
-@keyframes fadeOut {
     to {
         opacity: 1;
     }
@@ -36,17 +31,17 @@ body {
     position: fixed;
     top: 0;
     left: 0;
-    right: 0; 
+    right: 0;
     background-color: black;
     color: #ababab;
     display: flex;
     align-items: center;
-    justify-content: space-between; 
-    padding: 16px 32px; 
+    justify-content: space-between;
+    padding: 24px 20px;
     z-index: 100;
     overflow: hidden;
     transition: background-color 0.3s ease;
-    flex-wrap: wrap; 
+    flex-wrap: wrap;
 }
 
 .header:hover {
@@ -55,38 +50,51 @@ body {
 
 .bx-arrow-back {
     color: #ababab;
-    font-size: 24px;
+    font-size: 20px;
 }
 
 .header-content {
     display: flex;
     align-items: center;
-    margin-left: auto; 
-    flex-wrap: wrap; 
+    margin-left: auto;
+    flex-wrap: wrap;
 }
 
 .header-content h1 {
+    padding: 1px;
     margin: 0;
-    font-size: 12px; /* Smaller font size */
-    text-align: center; 
+    font-size: 10px;
+    text-align: center;
 }
 
-.main-content {
+.comments-section {
+    margin-top: 80px; 
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
     width: 100%;
-    margin-top: 4rem; 
-    padding: 1rem;
+    max-width: 800px;
 }
 
-.main-content h3 {
-    color: #ababab;
-    padding: 1rem 0;
-    border-bottom: 0.3rem solid #ababab;
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
+.comment-item {
+    margin-bottom: 10px;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
 }
 
-.main-content .contents {
-    margin-top: 1rem;
+.comment-item p {
+    font-size: 14px;
+    color: #333;
+}
+
+.comment-item small {
+    font-size: 12px;
+    color: #777;
+}
+
+.h2{
+    font-size: medium;
 }
 
 ul {
@@ -94,7 +102,7 @@ ul {
     padding: 0;
     width: 100%;
     max-width: 800px;
-    margin: 2rem auto; 
+    margin: 2rem auto;
 }
 
 li {
@@ -137,10 +145,10 @@ li a {
     box-sizing: border-box;
 }
 
-/* 1440x1080 pixels */
+/* Responsive Design Adjustments */
 @media (min-width: 1440px) {
     body {
-        font-size: 28px; 
+        font-size: 28px;
     }
 
     .header {
@@ -149,52 +157,32 @@ li a {
     }
 
     .bx-arrow-back {
-        font-size: 28px; 
+        font-size: 28px;
     }
 
-    li {
-        margin-top: 20px;
-    }
     li a {
         font-size: 28px;
-        padding: 24px; 
+        padding: 24px;
+    }
+
+    .h2 {
+        font-size: medium;
+    }
+
+    .comments-section {
+        margin-top: 80px; 
+
     }
 }
 
-/* 768x1024 pixels */
-@media (max-width: 1024px) and (min-width: 768px) {
+@media (max-width: 768px) and (min-width: 480px) {
     body {
-        font-size: 20px;
-        padding: 24px; 
+        font-size: 16px;
+        padding: 16px;
     }
 
     .header {
-        padding: 10px 24px; 
-        font-size: 12px;
-    }
-
-    .bx-arrow-back {
-        font-size: 24px; 
-    }
-
-    li {
-        margin-top: 16px;
-    }
-
-    li a {
-        font-size: 10px;    
-    }
-}
-
-/* 480x800 pixels */
-@media (max-width: 800px) and (min-width: 480px) {
-    body {
-        font-size: 16px; 
-        padding: 16px; 
-    }
-
-    .header {
-        height: 12px;
+        height: 50px;
         font-size: 10px;
     }
 
@@ -204,42 +192,43 @@ li a {
 
     li a {
         font-size: 32px;
-        padding: 24px; 
+        padding: 24px;
+    }
+
+    .comments-section {
+        margin-top: 60px; 
     }
 }
 
-/* 360x640 pixels */
-@media (max-width: 640px) and (min-width: 360px) {
+@media (max-width: 640px) and (min-width: 320px) {
     body {
-        font-size: 14px; 
-        padding: 12px; 
+        font-size: 10px;
+        padding: 12px;
     }
 
     .header {
-        padding: 8px; 
-        flex-direction: row; 
-        align-items: center; 
+        padding: 10px;
+        flex-direction: row;
+        align-items: center;
     }
 
     .bx-arrow-back {
-        font-size: 18px; 
-        margin-bottom: 8px; 
+        font-size: 12px;
+        margin-bottom: 8px;
     }
 
     .header-content h1 {
-        font-size: 12px; 
-        text-align: center; 
-        margin-left: 0; 
+        font-size: 2px;
+        text-align: center;
+        margin-left: 0;
     }
 
-    /* .main-content h3 {
-        font-size: 20px; 
-        padding: 8px 0; 
-        border-bottom-width: 3px; 
-    } */
-
     li a {
-        font-size: 11px; 
-        padding: 16px; 
+        font-size: 11px;
+        padding: 16px;
+    }
+
+    .comments-section {
+        margin-top: 60px; /* Adjust for mobile screens */
     }
 }

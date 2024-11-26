@@ -241,6 +241,60 @@ input[type="text"], input[type="email"] {
     text-decoration: none;
 }
 
+.comment-item {
+    display: flex;
+    flex-direction: column; /* Stack elements vertically */
+    justify-content: flex-start;
+    padding: 15px;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 10px;
+    position: relative;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Style the delete button */
+.delete-btn {
+    background: none;
+    border: none;
+    color: #888;
+    cursor: pointer;
+    font-size: 18px;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    transition: color 0.3s ease;
+}
+
+.delete-btn:hover {
+    color: #e74c3c;
+}
+
+/* Style the comment content */
+.comment-content {
+    margin-bottom: 10px;
+    flex-grow: 1; /* Ensure it takes up all available space */
+}
+
+/* Style the comment text */
+.comment-content p {
+    margin: 0;
+    font-size: 14px;
+    color: #333;
+}
+
+/* Style the timestamp (placed at the bottom) */
+.comment-content small {
+    display: block;
+    margin-top: 10px;
+    font-size: 12px;
+    color: #888;
+    text-align: left; /* Align the timestamp left */
+}
+
+
+
 /* Responsive styles */
 @media screen and (max-width: 768px) {
     .container {
@@ -270,6 +324,32 @@ input[type="text"], input[type="email"] {
     .btn {
         padding: 8px 12px;
         font-size: 14px;
+    }
+
+    .comment-item {
+        flex-direction: column; 
+        position: relative; 
+        align-items: flex-start; 
+        padding-top: 20px; 
+    }
+
+    .delete-btn {
+        position: absolute; 
+        top: 5px; 
+        right: 10px; 
+        font-size: 18px; 
+        color: red; 
+        cursor: pointer;
+    }
+
+    .comment-content p {
+        margin: 0;
+        font-size: 14px;
+    }
+
+    .comment-content small {
+        font-size: 12px; 
+        margin-top: 10px; 
     }
 }
 
@@ -305,7 +385,6 @@ input[type="text"], input[type="email"] {
         margin-left: 10px;
         margin-bottom: 5px;
         font-size: small;
-
     }
     
     #userIdInput {
@@ -331,6 +410,32 @@ input[type="text"], input[type="email"] {
         width: 80%;
         margin: 10% auto;
         font-size: auto;
+    }
+
+    .comment-item {
+        flex-direction: column;
+        position: relative;
+        align-items: flex-start;
+        padding-top: 20px;
+    }
+
+    .delete-btn {
+        position: absolute;
+        top: 5px;
+        right: 10px;
+        font-size: 16px; 
+        color: red;
+        cursor: pointer;
+    }
+
+    .comment-content p {
+        margin: 0;
+        font-size: 12px; 
+    }
+
+    .comment-content small {
+        font-size: 10px;
+        margin-top: 5px;
     }
 }
 

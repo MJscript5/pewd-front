@@ -13,10 +13,22 @@
 </head>
 
 <body>
-    <div class="header">
-        <a href="dashboard.html"><i class='bx bx-arrow-back' ></i></a>
-        <center><h1>Posture Checker</h1></center>
+    <header>
+        <div class="header">
+            <a href="dashboard.html"><i class='bx bx-arrow-back' ></i></a>
+            <h1>Posture Checker</h1>
+        </div>
+    </header>
+    
+
+    <!-- Comments Section -->
+    <div class="comments-section">
+        <h2>Doctor's Recommendations</h2>
+        <div id="commentList">
+            <!-- Comments will be populated dynamically here -->
+        </div>
     </div>
+
 
     <ul>
         <li style="background-image: url('pics/a1.png');">
@@ -80,19 +92,6 @@
           <a href="https://youtu.be/oBlpW40mvGA?si=csenevo-QN7kBMd4"> A Physical Therapist's Sitting Exercises for Better Posture </a>
         </li>
     </ul>
-
-    <script type="module">
-        import { checkAuth, redirectToLogin } from './auth.mjs';
-
-        document.addEventListener('DOMContentLoaded', async () => {
-            try {
-                await checkAuth();
-                // User is authenticated, no additional action needed for this page
-            } catch (error) {
-                console.error("User not logged in:", error);
-                redirectToLogin();
-            }
-        });
-    </script>
+    <script type="module" src="other.mjs"></script>
 </body>
 </html>

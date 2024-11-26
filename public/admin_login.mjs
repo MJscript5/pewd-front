@@ -12,10 +12,15 @@ export function displayMessage(message, isError = true) {
 
 async function checkLogin(email, password, rememberMe) {
     try {
-        await signInWithEmailAndPassword(auth, email, password);
-        console.log('Admin login successful');
+        
 
-        // Store the email in sessionStorage after successful login
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        const adminUid = user.uid;
+        sessionStorage.setItem('adminUid', adminUid);
+        localStorage.setItem('adminUid', adminUid); 
+        console.log('Admin UID stored:', adminUid);
+        console.log('Admin login successful');
         sessionStorage.setItem('adminEmail', email);
 
         if (rememberMe) {
